@@ -45,7 +45,8 @@ function finish(d){
   var saved=false;
   try{var bytes=new Uint8Array(12);crypto.getRandomValues(bytes);var id='cis_'+Array.from(bytes,function(b){return b.toString(16).padStart(2,'0');}).join('');sessionStorage.setItem('rr_case',id);sessionStorage.setItem('rr_diag',JSON.stringify({schemaVersion:'m1-cis-v1',case_id:id,mode:'STANDARD',ts:new Date().toISOString(),data:d}));saved=true;}catch(e){clearSaved();}
   if(saved){var link=document.createElement('a');link.href='success.html';link.className='btn secondary';link.textContent='Посмотреть свою анкету';resultContent.append(link);}else block('Анкета не сохранена','Браузер не разрешил сохранить ответы для следующей страницы. Результат доступен здесь; заявка никуда не отправлена.');
-  block('Персональный разбор пока недоступен','Готовим 7-дневный пилот: первый разбор и две корректировки, каждый ответ проверяет человек. Цена для первых трёх покупателей — 1 490 ₽, затем 2 490 ₽. Приём заказов ещё не открыт.');
+  block('Хотите разбор с проверкой человеком?','Готовим 7-дневный пилот: первый разбор и до двух корректировок. Первые три покупателя — 990 ₽, следующие семь — 1 490 ₽. Оплата пока не открыта; можно запросить уведомление о старте.');
+  var interest=document.createElement('a');interest.href='#offer';interest.className='btn';interest.textContent='Посмотреть формат и цену';resultContent.append(interest);
  }
  var restart=document.createElement('button');restart.type='button';restart.className='btn secondary';restart.style.marginTop='16px';restart.textContent='Удалить ответы и начать заново';restart.onclick=function(){resetDiagnostic();show(true);};resultContent.append(restart);result.focus();
 }
