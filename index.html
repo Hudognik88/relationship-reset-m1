@@ -48,6 +48,7 @@ details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:750;
 <form id="form">
 <div class="q active"><h3>How long have you been together?</h3><div class="opts" data-name="stage"></div></div>
 <div class="q"><h3>What happened most recently?</h3><textarea name="situation" required placeholder="Write 2–6 sentences in your own words."></textarea></div>
+<div class="q"><h3>One safety check</h3><p class="tiny">Does this involve physical violence, threats, stalking, forced sexual contact, fear for anyone’s safety, or controlling access to money, movement, communication, or support?</p><div class="opts" data-name="safety"></div></div>
 <div class="q"><h3>When did this happen?</h3><div class="opts" data-name="timing"></div></div>
 <div class="q"><h3>What did your partner do afterward?</h3><div class="opts" data-name="partner"></div></div>
 <div class="q"><h3>What did you do next?</h3><div class="opts" data-name="user"></div></div>
@@ -55,7 +56,7 @@ details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:750;
 <div class="q"><h3>What has helped before, if anything?</h3><textarea name="success" placeholder="Nothing is a valid answer."></textarea></div>
 <div class="q"><h3>What usually makes it worse?</h3><textarea name="failure" placeholder="For example: repeated messages, raised voices, trying to solve it immediately..."></textarea></div>
 <div class="q"><h3>What would be useful in the next 24–48 hours?</h3><div class="opts" data-name="goal"></div></div>
-<div class="q"><h3>One safety check</h3><p class="tiny">Does this involve physical violence, threats, stalking, forced sexual contact, fear for anyone’s safety, or controlling access to money, movement, communication, or support?</p><div class="opts" data-name="safety"></div></div>
+
 <div class="actions"><button type="button" class="btn secondary" id="back" disabled>Back</button><button type="button" class="btn" id="next">Next</button></div>
 </form>
 <div class="result" id="result" aria-live="polite"><div id="resultContent"></div></div>
@@ -116,6 +117,8 @@ function caseId(){var a=new Uint8Array(12);crypto.getRandomValues(a);var id='m1_
 function resetDiagnostic(){sessionStorage.removeItem('rr_case');sessionStorage.removeItem('rr_diag');form.reset();idx=0;form.style.display='block';result.classList.remove('show');resultContent.innerHTML='';show();setTimeout(function(){document.getElementById('diagnostic').scrollIntoView({behavior:'smooth',block:'start'})},0)}
 function attribution(){var src=new URLSearchParams(location.search),out={};['utm_source','utm_medium','utm_campaign','utm_content','utm_term','creator_code','wedge'].forEach(function(k){var v=src.get(k);if(v)out[k]=v.slice(0,150).replace(/[^A-Za-z0-9_-]/g,'_')});return out}
 function checkout(id){var u=new URL(CHECKOUT);u.searchParams.set('client_reference_id',id);var a=attribution();Object.keys(a).forEach(function(k){u.searchParams.set(k,a[k])});return u.toString()}
+function shortText(s,max){s=String(s||'').trim();if(!s)return '';return s.length>max?s.slice(0,max-1)+'…':s}
+function whyText(d){var w='It is designed to reduce pressure while matching the immediate goal you selected: '+d.goal.toLowerCase()+'.';var fail=shortText(d.failure,120),ok=shortText(d.success,120);if(fail)w+=' You also said that “'+fail+'” tends to make things worse, so this move avoids adding more of that pattern.';if(ok)w+=' You said “'+ok+'” has helped before; that becomes useful evidence for the next move.';return w}
 function move(d){
  var m={pattern:'From what you described, there may be a cycle where both of you are reacting to tension rather than getting enough space to reset.',avoid:'Do not try to solve the whole relationship problem in one conversation today.',action:'Choose one calm, low-pressure acknowledgment and leave room for your partner to respond in their own time.',words:'I do not want to keep pushing this tonight. I care about us, and I am open to talking when it feels calmer.'};
  if(d.partner==='Asked for space'){m={pattern:'Your partner asked for space while you are trying to reduce uncertainty about what happens next.',avoid:'Do not keep checking whether the space is over or send repeated explanations.',action:'Acknowledge the request once, then do not initiate another relationship conversation tonight unless your partner reaches out.',words:'I hear you. I will give you some space tonight. I care about us and I am here when you are ready.'}}
@@ -138,10 +141,10 @@ function finish(){
  '<div class="block"><h4>Do not do this right now</h4><p>'+esc(m.avoid)+'</p></div>'+
  '<div class="block"><h4>Today’s move</h4><p>'+esc(m.action)+'</p></div>'+
  '<div class="block"><h4>Words, if useful</h4><p>“'+esc(m.words)+'”</p></div>'+
- '<div class="block"><h4>Why this move</h4><p>It is designed to reduce pressure while matching the immediate goal you selected: '+esc(d.goal.toLowerCase())+'.</p></div>'+
+ '<div class="block"><h4>Why this move</h4><p>'+esc(whyText(d))+'</p></div>'+
  '<div class="offer"><div class="price">$149</div><div class="tiny">one-time · 30 days · no auto-renewal</div><h3>Continue with the 30-Day Relationship Reset</h3><p class="muted">A personalized situation profile, Situation Solver, practical wording, outcome check-ins, and plan adjustments based on what actually happens.</p><a class="btn" target="_blank" rel="noopener" href="'+checkout(id)+'">Continue to test checkout</a><div class="test">Sandbox only. This opens Stripe test checkout and cannot collect a real payment. Case reference: '+esc(id)+'</div><div style="margin-top:12px"><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button></div></div>';
 }
-next.onclick=function(){if(!valid()){alert('Please answer this question before continuing.');return}if(idx<qs.length-1){idx++;show()}else finish()};
+next.onclick=function(){if(!valid()){alert('Please answer this question before continuing.');return}var safetyHere=qs[idx].querySelector('[name="safety"]');if(safetyHere&&value('safety')==='Yes / unsure'){finish();return}if(idx<qs.length-1){idx++;show()}else finish()};
 back.onclick=function(){if(idx>0){idx--;show()}};
 document.getElementById('startDiagnostic').onclick=function(){resetDiagnostic()};
 show();
