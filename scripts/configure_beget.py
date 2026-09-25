@@ -13,7 +13,12 @@ import secrets
 import stat
 import subprocess
 import sys
+import tempfile
 import warnings
+
+AUTH_BEGIN = b"# BEGIN relationship-reset API authorization\n"
+AUTH_END = b"# END relationship-reset API authorization\n"
+AUTH_BLOCK = (AUTH_BEGIN + b'SetEnvIfNoCase Authorization "^(.+)$" HTTP_AUTHORIZATION=$1\n' + AUTH_END)
 
 
 class SetupError(Exception):
@@ -35,6 +40,52 @@ def create_private(path: Path, content: str) -> None:
         os.fsync(handle.fileno())
 
 
+def atomic_bytes(path: Path, content: bytes, mode: int) -> None:
+    fd, temporary = tempfile.mkstemp(prefix=".rr-config-", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+            os.fchmod(handle.fileno(), mode)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def forward_authorization(site: Path, shared: Path) -> tuple[Path, bytes | None, int] | None:
+    public = site / "public_html"
+    api = public / "api"
+    if public.is_symlink() or api.is_symlink() or not api.is_dir():
+        raise SetupError("Каталог API отсутствует или является символической ссылкой; настройка не изменена.")
+    path = api / ".htaccess"
+    before = None
+    mode = 0o644
+    if path.exists() or path.is_symlink():
+        info = path.lstat()
+        if not stat.S_ISREG(info.st_mode):
+            raise SetupError("Файл API .htaccess должен быть обычным файлом; настройка не изменена.")
+        before = path.read_bytes()
+        mode = stat.S_IMODE(info.st_mode)
+    content = before or b""
+    if AUTH_BEGIN.rstrip() in content or AUTH_END.rstrip() in content:
+        if (content.count(AUTH_BEGIN.rstrip()) != 1 or content.count(AUTH_END.rstrip()) != 1
+                or content.count(AUTH_BLOCK) != 1):
+            raise SetupError("Обнаружен изменённый блок авторизации API; .htaccess не перезаписан.")
+        return None
+    if before is not None:
+        # A private backup contains only the previous hosting configuration.
+        fd, _ = tempfile.mkstemp(prefix="api-htaccess-before-", suffix=".bak", dir=shared)
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(before)
+            handle.flush()
+            os.fsync(handle.fileno())
+    separator = b"\n" if content and not content.endswith(b"\n") else b""
+    atomic_bytes(path, content + separator + AUTH_BLOCK, mode)
+    return path, before, mode
+
+
 def php_run(php: str, args: list[str], env: dict[str, str], payload: str | None = None) -> str:
     result = subprocess.run([php, *args], input=payload, text=True,
                             capture_output=True, env=env, timeout=90)
@@ -47,7 +98,7 @@ def php_run(php: str, args: list[str], env: dict[str, str], payload: str | None 
     return result.stdout
 
 
-def configure(site: Path, database: str, php: str) -> None:
+def configure(site: Path, database: str, php: str, forward_auth: bool = False) -> None:
     if not re.fullmatch(r"[A-Za-z0-9_]+", database):
         raise SetupError("Некорректное имя базы.")
     site = site.resolve(strict=True)
@@ -130,9 +181,20 @@ try {
     print("Создаю / проверяю таблицы…", flush=True)
     php_run(php, [str(backend / "bin" / "migrate.php")], env)
     print("Таблицы готовы.", flush=True)
+    rollback = forward_authorization(site, shared) if forward_auth else None
     print("Проверяю HTTPS, запрет анонимного доступа и готовность базы…", flush=True)
     env["RR_OPERATOR_TOKEN"] = token
-    php_run(php, [str(backend / "bin" / "smoke.php"), "https://poslessory.ru/api"], env)
+    try:
+        php_run(php, [str(backend / "bin" / "smoke.php"), "https://poslessory.ru/api"], env)
+    except BaseException:
+        if rollback is not None:
+            path, before, mode = rollback
+            if before is None:
+                path.unlink()
+            else:
+                atomic_bytes(path, before, mode)
+            print("Проверка не пройдена: изменение .htaccess отменено. Реквизиты базы и токен сохранены.", flush=True)
+        raise
     print("ГОТОВО: база подключена, таблицы созданы, HTTPS/API проверены.")
     print("Режим staging. Клиентские данные и платежи не включены.")
 
@@ -142,9 +204,11 @@ def main() -> int:
     parser.add_argument("site", type=Path)
     parser.add_argument("database")
     parser.add_argument("--php", default="php8.3")
+    parser.add_argument("--forward-authorization", action="store_true",
+                        help="Передавать Authorization в PHP через API .htaccess; откатить изменение при ошибке smoke")
     args = parser.parse_args()
     try:
-        configure(args.site, args.database, args.php)
+        configure(args.site, args.database, args.php, args.forward_authorization)
         return 0
     except SetupError as error:
         print(str(error), file=sys.stderr)

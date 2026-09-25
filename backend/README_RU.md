@@ -39,6 +39,22 @@ python3 setup/configure_beget.py "$HOME/movereed.beget.tech" movereed_rrstage
 сохранения файлы остаются для повторной проверки. Параметр `--php` задаёт путь
 к PHP CLI, по умолчанию `php8.3`. Публичный сайт и приём платежей не включаются.
 
+Если smoke получает `health=200, unauthenticated=401, readiness=401`, повторный
+запуск сначала проверит совпадение локального токена с хешем в config. Для
+Apache/CGI на Beget можно затем включить передачу `Authorization` только для API:
+
+```sh
+python3 setup/configure_beget.py "$HOME/movereed.beget.tech" movereed_rrstage --forward-authorization
+```
+
+Нужна актуальная версия установщика. Флаг добавляет отмеченный блок
+`SetEnvIfNoCase` в `public_html/api/.htaccess`, сохраняя прежнее содержимое и
+приватную резервную копию. При ошибке HTTPS smoke предыдущее состояние файла
+восстанавливается. Проверка bearer-токена в PHP остаётся обязательной.
+Этот файл — настройка хостинга: текущий receiver сохраняет его при деплоях,
+а в архив выпуска он намеренно не включён. Ожидаемые статусы: `200 / 401 / 200`.
+Директива описана в [документации Apache](https://httpd.apache.org/docs/2.4/mod/mod_setenvif.html#setenvifnocase).
+
 Ручной вариант настройки:
 
 1. В Beget создать отдельную базу MySQL. У Beget имя пользователя совпадает с именем базы; для сайта использовать `localhost`.

@@ -26,6 +26,9 @@ class ConfigureBegetTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.site = Path(self.temporary.name) / "site"
         (self.site / "public_html").mkdir(parents=True)
+        self.api = self.site / "public_html" / "api"
+        self.api.mkdir()
+        self.htaccess = self.api / ".htaccess"
         self.private = self.site / "relationship-reset-private"
         self.backend = self.private / "releases" / ("a" * 40) / "backend"
         (self.backend / "bin").mkdir(parents=True)
@@ -39,6 +42,7 @@ class ConfigureBegetTests(unittest.TestCase):
         self.calls = []
         self.probe_fails = False
         self.smoke_fails = False
+        self.smoke_timeout = False
         self.smoke_status = ""
         original_umask = os.umask(0o077)
         self.addCleanup(os.umask, original_umask)
@@ -55,15 +59,20 @@ class ConfigureBegetTests(unittest.TestCase):
             # deliberately contains the password to catch accidental printing.
             output = "" if payload["resume"] else "<?php /* " + self.password + " */ return [];\n"
         else:
+            if self.smoke_timeout and command[1].endswith("/smoke.php"):
+                raise subprocess.TimeoutExpired(command, 90)
             if self.smoke_fails and command[1].endswith("/smoke.php"):
                 error = self.password + "\n" + self.smoke_status + kwargs["env"]["RR_OPERATOR_TOKEN"]
                 return subprocess.CompletedProcess(command, 1, self.password, error)
             output = "successful private step\n"
         return subprocess.CompletedProcess(command, 0, output, "")
 
-    def invoke(self, tty=True, password_effect=None):
+    def invoke(self, tty=True, password_effect=None, forward=False):
         output, errors = io.StringIO(), io.StringIO()
-        with mock.patch.object(sys, "argv", ["configure_beget.py", str(self.site), "movereed_rrstage"]), \
+        arguments = ["configure_beget.py", str(self.site), "movereed_rrstage"]
+        if forward:
+            arguments.append("--forward-authorization")
+        with mock.patch.object(sys, "argv", arguments), \
              mock.patch.object(sys.stdin, "isatty", return_value=tty), \
              mock.patch.object(setup.getpass, "getpass", return_value=self.password,
                                side_effect=password_effect) as password_prompt, \
@@ -199,6 +208,117 @@ class ConfigureBegetTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             setup.create_private(self.config_path, "REPLACEMENT")
         self.assertEqual(self.config_path.read_bytes(), before)
+
+    def test_default_does_not_change_host_configuration(self):
+        original = b"# unrelated hosting rule\r\nOptions -Indexes\r\n"
+        self.htaccess.write_bytes(original)
+        self.htaccess.chmod(0o640)
+        status, _, _ = self.invoke()
+        self.assertEqual(status, 0)
+        self.assertEqual(self.htaccess.read_bytes(), original)
+        self.assertEqual(self.htaccess.stat().st_mode & 0o777, 0o640)
+        self.assertEqual(list(self.shared.glob("api-htaccess-before-*.bak")), [])
+
+    def test_forwarding_preserves_original_bytes_permissions_and_private_backup(self):
+        self.existing_config()
+        credentials = self.config_path.read_bytes(), self.token_path.read_bytes()
+        original = b"# hosting settings\r\nOptions -Indexes"
+        self.htaccess.write_bytes(original)
+        self.htaccess.chmod(0o640)
+        status, output, prompts = self.invoke(forward=True)
+        self.assertEqual((status, prompts), (0, 0))
+        self.assertIn("ГОТОВО", output)
+        self.assertEqual(self.htaccess.read_bytes(), original + b"\n" + setup.AUTH_BLOCK)
+        self.assertEqual(self.htaccess.stat().st_mode & 0o777, 0o640)
+        backups = list(self.shared.glob("api-htaccess-before-*.bak"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_bytes(), original)
+        self.assertEqual(backups[0].stat().st_mode & 0o777, 0o600)
+        self.assertEqual(credentials, (self.config_path.read_bytes(), self.token_path.read_bytes()))
+        # A repeated opt-in does not append a second directive or backup.
+        before = self.htaccess.read_bytes()
+        status, _, _ = self.invoke(forward=True)
+        self.assertEqual(status, 0)
+        self.assertEqual(self.htaccess.read_bytes(), before)
+        self.assertEqual(list(self.shared.glob("api-htaccess-before-*.bak")), backups)
+
+    def test_forwarding_creates_api_file_only_and_is_idempotent(self):
+        status, _, _ = self.invoke(forward=True)
+        self.assertEqual(status, 0)
+        self.assertEqual(self.htaccess.read_bytes(), setup.AUTH_BLOCK)
+        self.assertEqual(self.htaccess.stat().st_mode & 0o777, 0o644)
+        self.assertFalse((self.site / "public_html" / ".htaccess").exists())
+        self.assertEqual(list(self.shared.glob("api-htaccess-before-*.bak")), [])
+        status, _, prompts = self.invoke(forward=True)
+        self.assertEqual((status, prompts), (0, 0))
+        self.assertEqual(self.htaccess.read_bytes(), setup.AUTH_BLOCK)
+        # A later unrelated failure must preserve a block that already existed.
+        self.smoke_fails = True
+        status, _, _ = self.invoke(forward=True)
+        self.assertEqual(status, 1)
+        self.assertEqual(self.htaccess.read_bytes(), setup.AUTH_BLOCK)
+
+    def test_forwarding_rolls_back_existing_and_new_files_on_401_and_500(self):
+        self.existing_config()
+        credentials = self.config_path.read_bytes(), self.token_path.read_bytes()
+        self.smoke_fails = True
+        for response in (401, 500):
+            for original in (None, b"Options -Indexes\n"):
+                with self.subTest(response=response, existing=original is not None):
+                    if original is not None:
+                        self.htaccess.write_bytes(original)
+                        self.htaccess.chmod(0o640)
+                    self.smoke_status = f"Smoke failed: health=200, unauthenticated=401, readiness={response}."
+                    status, output, prompts = self.invoke(forward=True)
+                    self.assertEqual((status, prompts), (1, 0))
+                    self.assertIn("изменение .htaccess отменено", output)
+                    if original is None:
+                        self.assertFalse(self.htaccess.exists())
+                    else:
+                        self.assertEqual(self.htaccess.read_bytes(), original)
+                        self.assertEqual(self.htaccess.stat().st_mode & 0o777, 0o640)
+                        self.htaccess.unlink()
+                    self.assertEqual(credentials, (self.config_path.read_bytes(), self.token_path.read_bytes()))
+                    self.assertNotIn(self.token_path.read_text().strip(), output)
+
+    def test_forwarding_rolls_back_on_smoke_timeout(self):
+        self.smoke_timeout = True
+        status, output, _ = self.invoke(forward=True)
+        self.assertEqual(status, 1)
+        self.assertFalse(self.htaccess.exists())
+        self.assertIn("изменение .htaccess отменено", output)
+        self.assertTrue(self.config_path.exists())
+
+    def test_forwarding_refuses_symlinked_api_and_nonregular_htaccess(self):
+        self.existing_config()
+        outside = Path(self.temporary.name) / "outside-api"
+        outside.mkdir()
+        outside_file = outside / ".htaccess"
+        outside_file.write_bytes(b"UNCHANGED")
+        self.htaccess.symlink_to(outside_file)
+        status, _, _ = self.invoke(forward=True)
+        self.assertEqual(status, 1)
+        self.assertEqual(outside_file.read_bytes(), b"UNCHANGED")
+        self.htaccess.unlink()
+        self.htaccess.mkdir()
+        status, _, _ = self.invoke(forward=True)
+        self.assertEqual(status, 1)
+        self.htaccess.rmdir()
+        self.api.rmdir()
+        self.api.symlink_to(outside, target_is_directory=True)
+        status, _, _ = self.invoke(forward=True)
+        self.assertEqual(status, 1)
+        self.assertEqual(outside_file.read_bytes(), b"UNCHANGED")
+        self.assertEqual(list(self.shared.glob("api-htaccess-before-*.bak")), [])
+
+    def test_forwarding_refuses_unexpected_marker_without_modification(self):
+        original = setup.AUTH_BEGIN + b"unexpected directive\n" + setup.AUTH_END
+        self.htaccess.write_bytes(original)
+        status, output, _ = self.invoke(forward=True)
+        self.assertEqual(status, 1)
+        self.assertIn("изменённый блок", output)
+        self.assertEqual(self.htaccess.read_bytes(), original)
+        self.assertEqual(list(self.shared.glob("api-htaccess-before-*.bak")), [])
 
 
 if __name__ == "__main__":
