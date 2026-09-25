@@ -50,6 +50,10 @@ Pilot measurements and price changes are manual. This site does not count purcha
 
 ## Development and verification
 
+### Test hosting before release
+
+The staged rollout is documented in [DEPLOYMENT_RU.md](DEPLOYMENT_RU.md). Run `python3 scripts/package_staging.py` to build `dist/relationship-reset-test.zip` from the existing public files. Only the generated copies receive the test banner and noindex metadata; the source pages stay unchanged. The ZIP is for invited fake-data testing on Beget's technical domain, not a sales launch. The account and hosting are not yet connected. Owner signup is the next external step; final-domain approval, payment setup and production release follow separately. Do not upload the entire repository or the personalized Prodamus PDF.
+
 No build or package install is required. Serve this directory as static files. Run `node --test tests/*.test.cjs` for the substantive rule regressions. `node --check app.js` and `node --check reset-logic.js` check syntax. Browser-check the normal flow, safety from free text and structured answers, no-contact, back/restart, intake validation/copy/delete, and narrow-screen layout after changes.
 
 ## Conversion draft verification
