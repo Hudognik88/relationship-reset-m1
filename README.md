@@ -1,6 +1,6 @@
 # Relationship Reset — M1 CIS
 
-Existing static GitHub Pages project, adapted for the Russian-speaking paid-pilot hypothesis on 25 September 2026. The international $149 / 30-day hypothesis is deferred in the existing sales package; the prior code remains in Git history.
+Existing Relationship Reset project, adapted for the Russian-speaking paid-pilot hypothesis on 25 September 2026. The public frontend remains static. This branch also includes the first staging PHP/MySQL backend and Beget deployment tooling. The international $149 / 30-day hypothesis is deferred in the existing sales package; the prior code remains in Git history.
 
 ## Conversion update — staging only, no commercial release
 
@@ -70,3 +70,14 @@ The Beget panel shows A records for the apex and `www` pointing to `87.236.16.38
 - Select the real intake and delivery channel, permitted AI service and data handling process; these remain unresolved.
 
 These tasks can proceed without waiting for domain troubleshooting. The commercial launch still depends on the open technical, operational and payment checks.
+
+## Backend and GitHub → Beget deployment — 25 September 2026
+
+The user requested automatic deployment, a database and a small backend while Prodamus testing is deferred. Continue this branch and the existing Beget site; no new hosting service or paid infrastructure was purchased.
+
+- [Backend contract and setup](docs/BACKEND_RU.md): PHP 8.3+, PDO MySQL, authenticated synthetic case storage/read and unreviewed draft storage. Public frontend behavior remains local. No public intake, payment confirmation or external LLM calls are enabled.
+- [Deployment setup](docs/BEGET_AUTODEPLOY_RU.md): staged archive with an explicit file allowlist, private backend outside `public_html`, preserved private config, scoped SSH receiver, backup and rollback. Migrations are a separate owner-run CLI step.
+- The authenticated Beget panel was inspected: MySQL 8.4 is available at `localhost`, the database user equals the database name, there are no databases yet and SSH access is off. Both domains are linked to the existing site directory in the panel; public DNS/HTTPS verification is separate.
+- Deployment source preparation is not proof of an active connection. Creating database credentials, authorizing SSH and configuring GitHub secrets remain owner steps before the first hosted run. No real customer data belongs in this staging API.
+
+The workflow's first verified deployment and authenticated database readiness must be recorded separately from local test results. See the pull request and Actions run for the current verification result.

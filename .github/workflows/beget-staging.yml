@@ -1,0 +1,95 @@
+name: Validate and deploy Beget staging
+
+on:
+  push:
+    branches: [main, m1-first-payment-20260925]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beget-staging-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: disposable-ci-root-only
+          MYSQL_DATABASE: rr_test
+          MYSQL_USER: rr_test
+          MYSQL_PASSWORD: disposable-ci-password-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2; official ref verified
+        with:
+          persist-credentials: false
+      - name: Install PHP 8.3 and PDO MySQL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq php8.3-cli php8.3-mysql
+          php8.3 -r 'exit(PHP_VERSION_ID >= 80300 && extension_loaded("pdo_mysql") ? 0 : 1);'
+      - name: Validate source and deployment boundaries
+        run: |
+          find backend api tests -name '*.php' -print0 | xargs -0 -n1 php8.3 -l
+          bash -n scripts/deploy_beget.sh scripts/receive_beget.sh scripts/install_beget_receiver.sh
+          node --test tests/reset-logic.test.cjs
+          php8.3 tests/backend-unit.php
+          python3 tests/deploy_test.py
+      - name: Test API against disposable MySQL 8.4
+        env:
+          RR_CONFIG_FILE: ${{ runner.temp }}/rr-ci-config.php
+        run: |
+          umask 077
+          # Ephemeral token exists only for this disposable local CI database.
+          RR_OPERATOR_TOKEN=$(php8.3 -r 'echo bin2hex(random_bytes(32));')
+          export RR_OPERATOR_TOKEN
+          php8.3 -r '$config=["environment"=>"staging","operator_token_sha256"=>hash("sha256",getenv("RR_OPERATOR_TOKEN")),"database"=>["host"=>"127.0.0.1","port"=>3306,"name"=>"rr_test","user"=>"rr_test","password"=>"disposable-ci-password-only"]]; file_put_contents(getenv("RR_CONFIG_FILE"), "<?php return ".var_export($config,true).";");'
+          php8.3 backend/bin/migrate.php
+          php8.3 tests/backend-integration.php
+          rm -f "$RR_CONFIG_FILE"
+      - name: Validate deploy archive
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: python3 scripts/package_backend.py --release "$RELEASE_SHA"
+
+  deploy:
+    needs: validate
+    # Never expose deployment secrets to PRs or deploy main. Missing opt-in skips.
+    if: >-
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/m1-first-payment-20260925' &&
+      vars.BEGET_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: beget-staging
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Build exact validated commit
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: python3 scripts/package_backend.py --release "$RELEASE_SHA"
+      - name: Deploy through restricted SSH key
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+          BEGET_SSH_HOST: ${{ secrets.BEGET_SSH_HOST }}
+          BEGET_SSH_USER: ${{ secrets.BEGET_SSH_USER }}
+          BEGET_SSH_PORT: ${{ vars.BEGET_SSH_PORT }}
+          BEGET_SSH_PRIVATE_KEY: ${{ secrets.BEGET_SSH_PRIVATE_KEY }}
+          BEGET_SSH_KNOWN_HOSTS: ${{ secrets.BEGET_SSH_KNOWN_HOSTS }}
+          BEGET_HEALTH_URL: ${{ vars.BEGET_HEALTH_URL }}
+        run: bash scripts/deploy_beget.sh dist/relationship-reset-beget-staging.tar.gz "$RELEASE_SHA"

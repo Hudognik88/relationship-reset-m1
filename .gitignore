@@ -1,0 +1,17 @@
+dist/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+backend/config.php
+backend/config.local.php
+config.local.php
+relationship-reset-private/
+*.pem
+*.key
+id_ed25519*
+id_rsa*
+*.sql.gz
+*.sqlite*
+
