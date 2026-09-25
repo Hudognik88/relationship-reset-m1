@@ -48,6 +48,7 @@ jobs:
           node --test tests/reset-logic.test.cjs
           php8.3 tests/backend-unit.php
           python3 tests/deploy_test.py
+          python3 tests/configure_beget_test.py
       - name: Test API against disposable MySQL 8.4
         env:
           RR_CONFIG_FILE: ${{ runner.temp }}/rr-ci-config.php
