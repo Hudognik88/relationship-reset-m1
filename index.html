@@ -88,7 +88,7 @@ details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:750;
 <details><summary>What if there is violence or coercion?</summary><p class="muted">The normal recommendation and sales flow stops. Safety-oriented guidance is shown instead.</p></details>
 </section>
 
-<footer>Relationship Reset M1 is a test build for product validation. No live payments are enabled.</footer>
+<footer>Relationship Reset M1 is a test build for product validation. No live payments are enabled.<br><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms &amp; Refunds</a></footer>
 </div>
 
 <script>
@@ -142,7 +142,7 @@ function finish(){
  '<div class="block"><h4>Today’s move</h4><p>'+esc(m.action)+'</p></div>'+
  '<div class="block"><h4>Words, if useful</h4><p>“'+esc(m.words)+'”</p></div>'+
  '<div class="block"><h4>Why this move</h4><p>'+esc(whyText(d))+'</p></div>'+
- '<div class="offer"><div class="price">$149</div><div class="tiny">one-time · 30 days · no auto-renewal</div><h3>Continue with the 30-Day Relationship Reset</h3><p class="muted">A personalized situation profile, Situation Solver, practical wording, outcome check-ins, and plan adjustments based on what actually happens.</p><a class="btn" target="_blank" rel="noopener" href="'+checkout(id)+'">Continue to test checkout</a><div class="test">Sandbox only. This opens Stripe test checkout and cannot collect a real payment. Case reference: '+esc(id)+'</div><div style="margin-top:12px"><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button></div></div>';
+ '<div class="offer"><div class="price">$149</div><div class="tiny">one-time · 30 days · no auto-renewal</div><h3>Continue with the 30-Day Relationship Reset</h3><p class="muted">A personalized situation profile, Situation Solver, practical wording, outcome check-ins, and plan adjustments based on what actually happens.</p><a class="btn" href="'+checkout(id)+'">Continue to test checkout</a><div class="test">Sandbox only. This opens Stripe test checkout and cannot collect a real payment. Case reference: '+esc(id)+'</div><div style="margin-top:12px"><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button></div></div>';
 }
 next.onclick=function(){if(!valid()){alert('Please answer this question before continuing.');return}var safetyHere=qs[idx].querySelector('[name="safety"]');if(safetyHere&&value('safety')==='Yes / unsure'){finish();return}if(idx<qs.length-1){idx++;show()}else finish()};
 back.onclick=function(){if(idx>0){idx--;show()}};
