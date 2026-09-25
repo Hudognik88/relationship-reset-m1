@@ -1,10 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Relationship Reset — M1</title>
-<meta name="description" content="A short relationship diagnostic that gives one concrete next step after conflict.">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relationship Reset — следующий шаг после ссоры</title>
+<meta name="description" content="Бесплатный ориентир после ссоры. Готовим 7-дневный пилот: персональный разбор и две корректировки с проверкой человеком.">
 <style>
 :root{--bg:#0f1117;--panel:#171a22;--line:#2a2f3a;--text:#f5f2ee;--muted:#aaa7b2;--a:#d8a8ff;--b:#9ee7d6;--warn:#ffe3a8;--danger:#ffb4ab}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 15% 0,#25152f 0,transparent 33%),radial-gradient(circle at 85% 12%,#10332f 0,transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55}
@@ -19,135 +18,33 @@ textarea{width:100%;min-height:120px;padding:13px;background:#151821;border:1px 
 .offer{padding:22px;margin-top:18px;background:linear-gradient(135deg,rgba(216,168,255,.12),rgba(158,231,214,.08));border-color:#594968}.price{font-size:42px;font-weight:900;letter-spacing:-.04em}.tiny{font-size:13px;color:var(--muted)}.test{font-size:13px;color:var(--warn);margin-top:10px}
 details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:750;cursor:pointer}footer{padding:40px 0;color:#77727e;font-size:13px}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding-top:38px}.diag{padding:16px}.q h3{font-size:21px}.btn{min-height:48px;width:100%}.actions .btn{width:auto;flex:1}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<nav class="nav"><div class="brand">Relationship Reset</div><div class="badge">SANDBOX / TEST MODE</div></nav>
 
-<header class="hero">
-<div class="eyebrow">A clearer next step after conflict</div>
-<h1>You had a fight. What should you do next?</h1>
-<p>Stop guessing whether to text, apologize, give space, or try to talk again. Start with a short diagnostic and get one concrete next move based on what actually happened.</p>
-<a class="btn" id="startDiagnostic" href="#diagnostic">Start the free diagnostic</a>
-<p class="tiny">You can start alone. Your partner does not need to sign up.</p>
-</header>
-
-<div class="grid">
-<div class="card"><h3>Specific, not generic</h3><p>We start with your current situation rather than a library of relationship tips.</p></div>
-<div class="card"><h3>One move at a time</h3><p>You get one low-pressure action you can actually take now.</p></div>
-<div class="card"><h3>Adapt based on outcomes</h3><p>The paid Reset is designed to change future recommendations based on what actually helps.</p></div>
-</div>
-
-<section id="diagnostic">
-<h2 class="title">Free relationship diagnostic</h2>
-<p class="muted">About 5 minutes. This is not therapy or a clinical assessment.</p>
-<p class="tiny">Prototype privacy: raw answers stay in this browser session. They are not sent to Stripe. Checkout receives only a random case ID and non-sensitive campaign tags.</p>
-<div class="diag">
-<div class="progress"><div id="bar"></div></div>
-<form id="form">
-<div class="q active"><h3>How long have you been together?</h3><div class="opts" data-name="stage"></div></div>
-<div class="q"><h3>What happened most recently?</h3><textarea name="situation" required placeholder="Write 2–6 sentences in your own words."></textarea></div>
-<div class="q"><h3>One safety check</h3><p class="tiny">Does this involve physical violence, threats, stalking, forced sexual contact, fear for anyone’s safety, or controlling access to money, movement, communication, or support?</p><div class="opts" data-name="safety"></div></div>
-<div class="q"><h3>When did this happen?</h3><div class="opts" data-name="timing"></div></div>
-<div class="q"><h3>What did your partner do afterward?</h3><div class="opts" data-name="partner"></div></div>
-<div class="q"><h3>What did you do next?</h3><div class="opts" data-name="user"></div></div>
-<div class="q"><h3>Does this pattern happen repeatedly?</h3><div class="opts" data-name="recurrence"></div></div>
-<div class="q"><h3>What has helped before, if anything?</h3><textarea name="success" placeholder="Nothing is a valid answer."></textarea></div>
-<div class="q"><h3>What usually makes it worse?</h3><textarea name="failure" placeholder="For example: repeated messages, raised voices, trying to solve it immediately..."></textarea></div>
-<div class="q"><h3>What would be useful in the next 24–48 hours?</h3><div class="opts" data-name="goal"></div></div>
-
-<div class="actions"><button type="button" class="btn secondary" id="back" disabled>Back</button><button type="button" class="btn" id="next">Next</button></div>
-</form>
-<div class="result" id="result" aria-live="polite"><div id="resultContent"></div></div>
-</div>
-</section>
-
-<section>
-<h2 class="title">What the 30-Day Reset includes</h2>
-<div class="grid">
-<div class="card"><h3>Situation profile</h3><p>A concise view of the interaction loop based on your answers and later outcomes.</p></div>
-<div class="card"><h3>Situation Solver</h3><p>Practical support when a real decision point appears during the 30-day period.</p></div>
-<div class="card"><h3>Outcome check-ins</h3><p>Recommendations can be adjusted based on what you actually did and what happened next.</p></div>
-</div>
-</section>
-
-<section>
-<h2 class="title">Trust & boundaries</h2>
-<div class="grid">
-<div class="card"><h3>Not therapy</h3><p>This is a non-clinical decision-support product.</p></div>
-<div class="card"><h3>No mind-reading</h3><p>We do not claim to know what your partner secretly thinks or feels.</p></div>
-<div class="card"><h3>No guaranteed reconciliation</h3><p>Recommendations are practical experiments, not promises about another person’s behavior.</p></div>
-</div>
-</section>
-
-<section>
-<h2 class="title">FAQ</h2>
-<details><summary>Does my partner need to join?</summary><p class="muted">No. You can start alone.</p></details>
-<details><summary>Is this a subscription?</summary><p class="muted">No. The M1 offer is $149 one-time for 30 days with no auto-renewal.</p></details>
-<details><summary>What if there is violence or coercion?</summary><p class="muted">The normal recommendation and sales flow stops. Safety-oriented guidance is shown instead.</p></details>
-</section>
-
-<footer>Relationship Reset M1 is a test build for product validation. No live payments are enabled.<br><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms &amp; Refunds</a></footer>
-</div>
-
-<script>
-var CHECKOUT='https://buy.stripe.com/test_bJe14mdfA3k9egi1kF5sA00';
-var options={
-stage:['Under 6 months','6–12 months','1–3 years','3–7 years','7+ years'],
-timing:['Today','Yesterday','2–3 days ago','More than 3 days ago'],
-partner:['Wanted to talk','Became quiet','Became angry','Asked for space','Acted normal but distant','Left / stopped replying','Other'],
-user:['Kept trying to talk','Apologized','Defended my position','Gave space','Sent more messages','Withdrew too','Tried to help practically','Other'],
-recurrence:['First time','Occasionally','Often','Almost every conflict'],
-goal:['Reopen calm communication','Apologize properly','Reduce tension','Give space without creating more distance','Understand what my partner needs','Stop repeating the same argument','Other'],
-safety:['No','Yes / unsure']
-};
-Object.keys(options).forEach(function(name){
- var box=document.querySelector('[data-name="'+name+'"]'); if(!box)return;
- options[name].forEach(function(v,i){
-  box.insertAdjacentHTML('beforeend','<label class="opt"><input required type="radio" name="'+name+'" value="'+v.replace(/"/g,'&quot;')+'"> '+v+'</label>');
- });
-});
-var qs=[].slice.call(document.querySelectorAll('.q')),idx=0,bar=document.getElementById('bar');
-function show(){qs.forEach(function(q,i){q.classList.toggle('active',i===idx)});bar.style.width=((idx+1)/qs.length*100)+'%';back.disabled=idx===0;next.textContent=idx===qs.length-1?'See my result':'Next';}
-function valid(){var req=[].slice.call(qs[idx].querySelectorAll('[required]'));if(!req.length)return true;if(req[0].type==='radio')return req.some(function(x){return x.checked});return req.every(function(x){return x.value.trim().length>0});}
-function value(n){var e=document.querySelector('[name="'+n+'"]:checked')||document.querySelector('[name="'+n+'"]');return e?e.value:''}
-function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
-function caseId(){var a=new Uint8Array(12);crypto.getRandomValues(a);var id='m1_'+Array.from(a,function(b){return b.toString(16).padStart(2,'0')}).join('');sessionStorage.setItem('rr_case',id);return id}
-function resetDiagnostic(){sessionStorage.removeItem('rr_case');sessionStorage.removeItem('rr_diag');form.reset();idx=0;form.style.display='block';result.classList.remove('show');resultContent.innerHTML='';show();setTimeout(function(){document.getElementById('diagnostic').scrollIntoView({behavior:'smooth',block:'start'})},0)}
-function attribution(){var src=new URLSearchParams(location.search),out={};['utm_source','utm_medium','utm_campaign','utm_content','utm_term','creator_code','wedge'].forEach(function(k){var v=src.get(k);if(v)out[k]=v.slice(0,150).replace(/[^A-Za-z0-9_-]/g,'_')});return out}
-function checkout(id){var u=new URL(CHECKOUT);u.searchParams.set('client_reference_id',id);var a=attribution();Object.keys(a).forEach(function(k){u.searchParams.set(k,a[k])});return u.toString()}
-function shortText(s,max){s=String(s||'').trim();if(!s)return '';return s.length>max?s.slice(0,max-1)+'…':s}
-function whyText(d){var w='It is designed to reduce pressure while matching the immediate goal you selected: '+d.goal.toLowerCase()+'.';var fail=shortText(d.failure,120),ok=shortText(d.success,120);if(fail)w+=' You also said that “'+fail+'” tends to make things worse, so this move avoids adding more of that pattern.';if(ok)w+=' You said “'+ok+'” has helped before; that becomes useful evidence for the next move.';return w}
-function move(d){
- var m={pattern:'From what you described, there may be a cycle where both of you are reacting to tension rather than getting enough space to reset.',avoid:'Do not try to solve the whole relationship problem in one conversation today.',action:'Choose one calm, low-pressure acknowledgment and leave room for your partner to respond in their own time.',words:'I do not want to keep pushing this tonight. I care about us, and I am open to talking when it feels calmer.'};
- if(d.partner==='Asked for space'){m={pattern:'Your partner asked for space while you are trying to reduce uncertainty about what happens next.',avoid:'Do not keep checking whether the space is over or send repeated explanations.',action:'Acknowledge the request once, then do not initiate another relationship conversation tonight unless your partner reaches out.',words:'I hear you. I will give you some space tonight. I care about us and I am here when you are ready.'}}
- else if(d.partner==='Became quiet'&&(d.user==='Kept trying to talk'||d.user==='Sent more messages')){m={pattern:'You appear to move toward the conversation when tension rises, while your partner becomes quieter; more attempts may be increasing the pressure.',avoid:'Do not send another long explanation or ask for an immediate answer.',action:'Send one low-pressure acknowledgment, then pause contact about the conflict for the rest of the evening.',words:'I can see I have been pushing for an answer. You do not need to respond right now. I would rather talk when we are both calmer.'}}
- else if(d.partner==='Became angry'){m={pattern:'The conversation seems to be escalating faster than either of you can resolve the original issue.',avoid:'Do not reopen the disputed point while either of you is still activated.',action:'Pause the topic and suggest one specific later window for a calmer conversation, without demanding agreement right now.',words:'I do not think we will solve this well while we are both upset. I would like to come back to it tomorrow when we are calmer.'}}
- else if(d.partner==='Wanted to talk'){m={pattern:'Your partner appears willing to engage, so the main risk is turning the next conversation into another round of defending positions.',avoid:'Do not begin by proving your point or listing everything they did wrong.',action:'Start by naming one thing you understand about their experience before explaining your own position.',words:'Before I explain my side, I want to make sure I understand what felt worst for you.'}}
- return m;
-}
-function finish(){
- var d={stage:value('stage'),situation:value('situation'),timing:value('timing'),partner:value('partner'),user:value('user'),recurrence:value('recurrence'),success:value('success'),failure:value('failure'),goal:value('goal'),safety:value('safety')};
- var id=caseId();sessionStorage.setItem('rr_diag',JSON.stringify({data:d,ts:new Date().toISOString()}));
- form.style.display='none';result.classList.add('show');
- if(d.safety==='Yes / unsure'){
-  resultContent.innerHTML='<div class="block danger"><h4>Safety comes first</h4><p>The situation you described may involve safety, coercion, or fear. A normal relationship recommendation may not be appropriate here. Prioritize immediate safety and consider qualified local support. If you are in immediate danger, contact local emergency services. Relationship Reset should not guide confrontation or reconciliation in this situation.</p></div><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button>';return;
- }
- var m=move(d);
- resultContent.innerHTML=
- '<div class="block"><h4>Situation summary</h4><p>You are trying to '+esc(d.goal.toLowerCase())+'. The conflict happened '+esc(d.timing.toLowerCase())+'; afterward your partner '+esc(d.partner.toLowerCase())+', while you '+esc(d.user.toLowerCase())+'.</p></div>'+
- '<div class="block"><h4>The pattern</h4><p>'+esc(m.pattern)+'</p></div>'+
- '<div class="block"><h4>Do not do this right now</h4><p>'+esc(m.avoid)+'</p></div>'+
- '<div class="block"><h4>Today’s move</h4><p>'+esc(m.action)+'</p></div>'+
- '<div class="block"><h4>Words, if useful</h4><p>“'+esc(m.words)+'”</p></div>'+
- '<div class="block"><h4>Why this move</h4><p>'+esc(whyText(d))+'</p></div>'+
- '<div class="offer"><div class="price">$149</div><div class="tiny">one-time · 30 days · no auto-renewal</div><h3>Continue with the 30-Day Relationship Reset</h3><p class="muted">A personalized situation profile, Situation Solver, practical wording, outcome check-ins, and plan adjustments based on what actually happens.</p><a class="btn" href="'+checkout(id)+'">Continue to test checkout</a><div class="test">Sandbox only. This opens Stripe test checkout and cannot collect a real payment. Case reference: '+esc(id)+'</div><div style="margin-top:12px"><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button></div></div>';
-}
-next.onclick=function(){if(!valid()){alert('Please answer this question before continuing.');return}var safetyHere=qs[idx].querySelector('[name="safety"]');if(safetyHere&&value('safety')==='Yes / unsure'){finish();return}if(idx<qs.length-1){idx++;show()}else finish()};
-back.onclick=function(){if(idx>0){idx--;show()}};
-document.getElementById('startDiagnostic').onclick=function(){resetDiagnostic()};
-show();
-</script>
-</body>
-</html>
+a{color:var(--a)}button,input,textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--b);outline-offset:4px}.tiny,.test,.badge,.eyebrow,.block h4,footer{font-size:14px}.notice{padding:14px;border:1px solid #826c36;border-radius:12px;color:var(--warn)}.field-label{display:block;font-weight:700;margin:16px 0 8px}.error{color:var(--danger);margin-top:12px}[hidden]{display:none!important}.q h3:focus,.result:focus{outline:none}.nav{flex-wrap:wrap}.btn{text-align:center;max-width:100%}h1,h2,h3,p{overflow-wrap:anywhere}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress div{transition:none}}
+fieldset{margin:12px 0 18px;padding:0;border:0}legend{margin-bottom:12px;font-weight:650}</style>
+</head><body><main class="wrap">
+<nav class="nav" aria-label="Главная"><div class="brand">Relationship Reset</div><div class="badge">Бесплатная версия · оплаты пока нет</div></nav>
+<header class="hero"><div class="eyebrow">Можно начать одному</div><h1>Поссорились.<br>Что делать дальше?</h1>
+<p>Написать, поговорить или дать пространство? Разберите ситуацию по короткой анкете и выберите один следующий шаг без давления.</p>
+<a class="btn" id="startDiagnostic" href="#diagnostic">Пройти бесплатную анкету</a><p class="tiny">Около 5 минут · для взрослых 18+ · партнёру не нужен аккаунт</p></header>
+<div class="grid"><div class="card"><h3>Сначала границы</h3><p>Просьба не писать важнее желания скорее помириться. Иногда следующий шаг — не начинать контакт.</p></div><div class="card"><h3>Один шаг</h3><p>Не нужно решать всё сразу. Начните с небольшого действия, которое зависит от вас.</p></div><div class="card"><h3>С учётом попыток</h3><p>Отметьте, что уже помогало и что ухудшало ситуацию, чтобы не повторять неподходящий шаг.</p></div></div>
+<section id="diagnostic"><h2 class="title">Разберём текущую ситуацию</h2><p class="muted">Бесплатный результат — предварительный ориентир по выбранным ответам. Его составляют автоматические правила; человек его не проверяет. Это не терапия и не оценка безопасности.</p><p class="tiny">Не указывайте имена, контакты и другие узнаваемые детали. Ответы не отправляются с этой страницы и остаются в текущей вкладке. <a href="privacy.html">Как используются данные</a></p>
+<div class="diag"><div class="progress" role="progressbar" aria-label="Прогресс анкеты" aria-valuemin="0" aria-valuemax="10"><div id="bar"></div></div><p id="step" class="tiny"></p>
+<form id="form" novalidate>
+<div class="q active"><h3 tabindex="-1">Начнём с вас</h3><fieldset><legend>Вам уже исполнилось 18 лет?</legend><div class="opts" data-name="age"></div></fieldset><fieldset><legend>Как долго вы вместе?</legend><div class="opts" data-name="stage"></div></fieldset></div>
+<div class="q"><h3 tabindex="-1"><label for="situation">Что произошло в последний раз?</label></h3><textarea id="situation" name="situation" required maxlength="2000" placeholder="2–6 предложений: что произошло и какие слова вы услышали."></textarea></div>
+<div class="q"><h3 tabindex="-1">Безопасность и границы контакта</h3><fieldset><legend>Есть ли угрозы, насилие, преследование, сексуальное принуждение, ограничение денег, свободы или общения, страх за безопасность либо риск причинить вред себе?</legend><div class="opts" data-name="safety"></div></fieldset><fieldset><legend>Что партнёр сейчас говорит о контакте?</legend><div class="opts" data-name="boundary"></div></fieldset></div>
+<div class="q"><h3 tabindex="-1">Когда это произошло?</h3><div class="opts" data-name="timing"></div></div>
+<div class="q"><h3 tabindex="-1">Как отреагировал партнёр?</h3><div class="opts" data-name="partner"></div></div>
+<div class="q"><h3 tabindex="-1">Что вы сделали затем?</h3><div class="opts" data-name="user"></div></div>
+<div class="q"><h3 tabindex="-1">Такое повторяется?</h3><div class="opts" data-name="recurrence"></div></div>
+<div class="q"><h3 tabindex="-1">Что раньше помогало?</h3><div class="opts" data-name="helpful"></div><label class="field-label" for="success">Пример, если есть</label><textarea id="success" name="success" maxlength="1000" placeholder="Необязательно. Что вы сделали и что изменилось?"></textarea></div>
+<div class="q"><h3 tabindex="-1">Что ухудшало ситуацию?</h3><p class="tiny">Выберите главное. Если вариантов несколько, дополните описание.</p><div class="opts" data-name="failureType"></div><label class="field-label" for="failure">Что произошло после этой попытки?</label><textarea id="failure" name="failure" maxlength="1000" placeholder="Необязательно. Например: после нового сообщения напряжение выросло."></textarea></div>
+<div class="q"><h3 tabindex="-1">Что сейчас было бы полезнее?</h3><div class="opts" data-name="goal"></div></div>
+<p id="formError" class="error" role="alert" hidden></p><div class="actions"><button type="button" class="btn secondary" id="back" disabled>Назад</button><button type="button" class="btn" id="next">Далее</button></div>
+</form><div class="result" id="result" tabindex="-1" aria-live="polite"><div id="resultContent"></div></div></div></section>
+<section data-offer><h2 class="title">7-дневный Reset после ссоры</h2><p class="muted">Готовим небольшой платный пилот для обычных конфликтов без насилия и принуждения. Персональный разбор создаётся с помощью ИИ; каждый ответ проверяет человек.</p><div class="grid"><div class="card"><h3>Первый разбор</h3><p>Что известно о ситуации, чего пока не хватает и какое действие можно попробовать без давления.</p></div><div class="card"><h3>Две корректировки</h3><p>Вы рассказываете, что сделали и что произошло. Мы уточняем следующий шаг в пределах 7 дней.</p></div><div class="card"><h3>Понятные сроки</h3><p>Первый ответ — в течение 24 часов после подтверждения оплаты и получения анкеты. С него начинаются 7 дней. Корректировки — в течение 24 часов после обращения.</p></div></div><div class="offer"><div class="price">1 490 ₽</div><p>Цена для первых трёх покупателей пилота. Затем — 2 490 ₽ за тот же объём.</p><p class="tiny">Одна оплата · первый разбор + две корректировки · без автопродления и безлимитной переписки</p><p class="notice">Приём заказов ещё не открыт. Сейчас доступна только бесплатная анкета.</p></div></section>
+<section><h2 class="title">Чего мы не обещаем</h2><div class="grid"><div class="card"><h3>Не заменяем терапию</h3><p>Это помощь с конкретным следующим действием, а не диагностика или лечение.</p></div><div class="card"><h3>Не читаем мысли</h3><p>Молчание не объясняет мотивы другого человека. Опираемся на сообщённые факты.</p></div><div class="card"><h3>Не гарантируем примирение</h3><p>Результат зависит от обоих людей. Уважение к отказу от контакта важнее продолжения разговора.</p></div></div></section>
+<section><h2 class="title">Частые вопросы</h2><details><summary>Нужно ли участие партнёра?</summary><p class="muted">Нет, можно начать одному. Не нужно передавать чужие контакты или переписку.</p></details><details data-offer><summary>Это подписка?</summary><p class="muted">Нет. Планируется разовая оплата за 7 дней: первый разбор и две корректировки. Продление не происходит автоматически.</p></details><details><summary>Что делать при угрозах или насилии?</summary><p class="muted">Обычные рекомендации и предложение программы останавливаются. При непосредственной опасности обратитесь в местные экстренные службы, если это безопасно. Короткая анкета не заменяет специализированную помощь.</p></details><details><summary>Кто читает бесплатную анкету?</summary><p class="muted">Она обрабатывается в вашем браузере. Сейчас ответы не передаются оператору или ИИ. Вы можете просмотреть и скопировать их, но это не отправка заявки.</p></details></section>
+<footer>Relationship Reset · пилот готовится, реальные платежи отключены.<br><a href="privacy.html">Данные и приватность</a> · <a href="terms.html">Условия и возвраты</a></footer>
+<noscript><p class="notice">Для анкеты нужен JavaScript. Оплаты на этой странице нет.</p></noscript>
+</main><script src="reset-logic.js"></script><script src="app.js"></script></body></html>

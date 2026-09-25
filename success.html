@@ -1,16 +1,61 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Checkout complete — Relationship Reset M1</title>
-<style>body{margin:0;background:#0f1117;color:#f5f2ee;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55}.wrap{max-width:720px;margin:auto;padding:36px 18px}.card{background:#171a22;border:1px solid #2a2f3a;border-radius:18px;padding:22px;margin:14px 0}.ok{color:#9ee7d6}.warn{color:#ffe3a8}.btn{display:inline-flex;padding:13px 18px;border:0;border-radius:12px;background:#d8a8ff;color:#111;font-weight:800;cursor:pointer;text-decoration:none}.secondary{background:transparent;color:#f5f2ee;border:1px solid #2a2f3a}.muted{color:#aaa7b2}textarea{width:100%;min-height:220px;background:#10131a;border:1px solid #2a2f3a;color:#f5f2ee;border-radius:12px;padding:12px;box-sizing:border-box}</style>
-</head><body><main class="wrap"><p><a class="secondary btn" href="./">← Back to Relationship Reset</a></p>
-<h1>Checkout complete</h1><p class="ok"><strong>Sandbox M1 flow:</strong> this page is for testing the post-payment handoff.</p>
-<div class="card"><h2>What happens next</h2><p>For the first M1 customers, payment is manually verified in Stripe before fulfillment begins. A success redirect alone is not treated as proof of payment.</p><p id="sessionLine" class="muted"></p><p id="caseLine"></p></div>
-<div class="card"><h2>Your paid intake handoff</h2><p id="stateMsg">Checking this browser session for your diagnostic…</p><div id="intakeArea" hidden><textarea id="intake" readonly></textarea><p><button class="btn" id="copyBtn">Copy my intake</button></p><p class="muted">For M1, send this copied intake only through the agreed tester/support channel after payment. A dedicated secure submission channel will replace this manual step before scale.</p></div></div>
-<div class="card"><h2>Privacy reminder</h2><p>Your diagnostic is not being submitted automatically from this page. You decide whether to copy and send it for fulfillment.</p><p><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms & Refunds</a></p></div>
-</main><script>
-const q=new URLSearchParams(location.search);const sid=q.get('session_id');const raw=sessionStorage.getItem('rr_diag');const cid=sessionStorage.getItem('rr_case');
-document.getElementById('sessionLine').textContent=sid?'Checkout session reference: '+sid:'No checkout session reference is present in this URL.';
-document.getElementById('caseLine').textContent=cid?'Case reference: '+cid:'Case reference was not found in this browser session.';
-if(raw){try{const obj=JSON.parse(raw);const payload={case_id:cid||null,checkout_session_id:sid||null,submitted_at:new Date().toISOString(),diagnostic:obj.data||obj};document.getElementById('intake').value=JSON.stringify(payload,null,2);document.getElementById('intakeArea').hidden=false;document.getElementById('stateMsg').textContent='Your diagnostic is still available in this browser session. It has not been sent automatically.';}catch(e){document.getElementById('stateMsg').textContent='Your diagnostic was found but could not be prepared for handoff.'}}else{document.getElementById('stateMsg').innerHTML='<span class="warn">No diagnostic is available in this tab/session. Return to the diagnostic and start again; do not rely on this page alone for fulfillment.</span>'}
-document.getElementById('copyBtn')?.addEventListener('click',async()=>{const t=document.getElementById('intake');try{await navigator.clipboard.writeText(t.value);document.getElementById('copyBtn').textContent='Copied';}catch(e){t.select();document.execCommand('copy');document.getElementById('copyBtn').textContent='Copied';}});
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ваша анкета — Relationship Reset</title>
+<style>body{margin:0;background:#0f1117;color:#f5f2ee;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.6}.wrap{max-width:760px;margin:auto;padding:32px 18px 60px}.card{background:#171a22;border:1px solid #2a2f3a;border-radius:18px;padding:22px;margin:18px 0}h1{font-size:clamp(30px,6vw,40px);line-height:1.15}h2{font-size:23px;line-height:1.3}.note{color:#ffe3a8}.btn{display:inline-flex;padding:13px 18px;border:1px solid transparent;border-radius:12px;background:#d8a8ff;color:#111;font:inherit;font-weight:750;cursor:pointer;text-decoration:none}.secondary{background:transparent;color:#f5f2ee;border-color:#444853}.muted{color:#aaa7b2}a{color:#d8a8ff}textarea{width:100%;min-height:380px;background:#10131a;border:1px solid #555b6a;color:#f5f2ee;border-radius:12px;padding:12px;box-sizing:border-box;font:inherit;line-height:1.5;resize:vertical}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #9ee7d6;outline-offset:4px}.actions{display:flex;flex-wrap:wrap;gap:12px}.case{overflow-wrap:anywhere}[hidden]{display:none!important}</style>
+</head><body><main class="wrap"><p><a href="./">← Relationship Reset</a></p>
+<h1>Ваша анкета</h1><p class="note">Эта страница показывает только ответы, сохранённые в вашей вкладке. Она не подтверждает оплату или приём заказа.</p>
+<div class="card"><h2>Сохранённые ответы</h2><p id="stateMsg" role="status" aria-live="polite">Проверяем, есть ли завершённая анкета в этой вкладке…</p><p id="caseLine" class="muted case"></p><div id="intakeArea" hidden><label for="intake">Текст для вашего просмотра и копирования</label><textarea id="intake" readonly spellcheck="false"></textarea><p class="actions"><button class="btn" id="copyBtn" type="button">Скопировать анкету</button><button class="btn secondary" id="eraseBtn" type="button">Удалить анкету</button></p><p id="copyStatus" role="status" aria-live="polite"></p></div><p><a href="./#diagnostic">Вернуться к бесплатной анкете</a></p></div>
+<div class="card"><h2>Платный пилот ещё готовится</h2><p>Рабочего канала поддержки и передачи анкеты пока нет. Ничего не отправляется автоматически; отправлять эту анкету для оказания услуги сейчас не нужно.</p><p>В планируемом 7-дневном пилоте будут первый персональный ответ и две корректировки. ИИ поможет с черновиками, человек проверит каждый ответ. До открытия продаж здесь появятся сведения о продавце, способ оплаты и понятный порядок получения услуги.</p></div>
+<div class="card"><h2>Вы управляете своими данными</h2><p>Удаление очищает сохранённый случай в этой вкладке. Буфер обмена, ваши файлы и копии в других вкладках нужно очистить отдельно. Закрытие вкладки обычно удаляет её сессию, но восстановление вкладок браузером может вернуть данные.</p><p><a href="privacy.html">Конфиденциальность</a> · <a href="terms.html">Условия планируемого пилота</a></p></div>
+</main><script src="reset-logic.js"></script><script>
+'use strict';
+var fieldLabels={age:'Возраст',stage:'Продолжительность отношений',situation:'Что произошло',safety:'Безопасность',boundary:'Границы общения',timing:'Когда это произошло',partner:'Что сделал партнёр',user:'Что сделали вы',recurrence:'Как часто это повторяется',helpful:'Что помогало',success:'Что помогало: ваши слова',failureType:'Что ухудшало ситуацию',failure:'Что ухудшало ситуацию: ваши слова',goal:'Что сейчас нужно'};
+var choiceLabels={
+age:{adult:'18 лет или старше'},
+safety:{no:'Указанных рисков нет'},
+boundary:{clear:'Просьбы о паузе или прекращении общения не было',space:'Попросили дать пространство / сделать паузу',no_contact:'Попросили не связываться',unsure:'Не уверен(а)'},
+stage:{under6m:'Меньше 6 месяцев','6to12m':'6–12 месяцев','1to3y':'1–3 года','3to7y':'3–7 лет','7plus':'Больше 7 лет'},
+timing:{today:'Сегодня',yesterday:'Вчера','2to3days':'2–3 дня назад',older:'Раньше'},
+partner:{talk:'Хотел(а) поговорить',quiet:'Замолчал(а)',angry:'Сердился / сердилась',space:'Попросил(а) пространство',distant:'Держался / держалась отстранённо',left:'Ушёл / ушла',other:'Другое'},
+user:{talk:'Продолжал(а) пытаться поговорить',apology:'Извинился / извинилась',defend:'Защищал(а) свою позицию',space:'Дал(а) пространство',messages:'Отправлял(а) ещё сообщения',withdraw:'Тоже отстранился / отстранилась',help:'Пытался / пыталась помочь делом',other:'Другое'},
+recurrence:{first:'Впервые',sometimes:'Иногда',often:'Часто',always:'Почти всегда'},
+helpful:{pause:'Пауза',listen:'Выслушать',practical:'Практическая помощь',none:'Ничего',unsure:'Не знаю'},
+failureType:{messages:'Новые сообщения',apology:'Повторные извинения',talk:'Попытки поговорить',pause:'Пауза',other:'Другое',none:'Ничего',unsure:'Не знаю'},
+goal:{talk:'Поговорить',apology:'Извиниться',calm:'Успокоиться',space:'Дать пространство',understand:'Лучше понять ситуацию',pattern:'Изменить повторяющуюся ситуацию',other:'Другое'}
+};
+function isRecord(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
+function validSavedCase(obj,cid){
+if(!isRecord(obj)||obj.schemaVersion!=='m1-cis-v1'||obj.mode!=='STANDARD'||typeof cid!=='string'||!/^cis_[a-f0-9]{24}$/.test(cid)||obj.case_id!==cid)return false;
+if(typeof obj.ts!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(obj.ts))return false;
+var time=Date.parse(obj.ts);if(!Number.isFinite(time)||time>Date.now()||new Date(time).toISOString()!==obj.ts)return false;
+var d=obj.data;if(!isRecord(d)||d.age!=='adult'||d.safety!=='no')return false;
+var expected=Object.keys(fieldLabels);if(Object.keys(d).length!==expected.length||!expected.every(function(k){return Object.prototype.hasOwnProperty.call(d,k)}))return false;
+if(!Object.keys(choiceLabels).every(function(key){return typeof d[key]==='string'&&Object.prototype.hasOwnProperty.call(choiceLabels[key],d[key])}))return false;
+if(typeof d.situation!=='string'||!d.situation.trim()||d.situation.length>2000)return false;
+if(typeof d.success!=='string'||d.success.length>1000||typeof d.failure!=='string'||d.failure.length>1000)return false;
+if(typeof ResetLogic==='undefined'||typeof ResetLogic.move!=='function'||ResetLogic.move(d).mode!=='STANDARD')return false;
+return true;
+}
+function clearSavedCase(){var cleared=true;['rr_diag','rr_case'].forEach(function(key){try{sessionStorage.removeItem(key)}catch(e){cleared=false}});return cleared;}
+function hideIntake(){document.getElementById('intakeArea').hidden=true;document.getElementById('intake').value='';document.getElementById('caseLine').textContent='';document.getElementById('copyStatus').textContent='';}
+function loadIntake(){
+hideIntake();var raw,cid;try{raw=sessionStorage.getItem('rr_diag');cid=sessionStorage.getItem('rr_case')}catch(e){document.getElementById('stateMsg').textContent='Хранилище этой вкладки недоступно. Здесь нельзя показать анкету. Вы можете вернуться к бесплатному разбору.';return;}
+if(!raw&&!cid){document.getElementById('stateMsg').textContent='В этой вкладке нет завершённой анкеты. Вернитесь к бесплатному разбору, если хотите заполнить её.';return;}
+var obj;try{if(!raw||raw.length>24000)throw new Error('invalid');obj=JSON.parse(raw);if(!validSavedCase(obj,cid))throw new Error('invalid');}catch(e){var removed=clearSavedCase();document.getElementById('stateMsg').textContent=removed?'Сохранённая анкета неполная или не подходит для этой версии. Она удалена из этой вкладки. Начните бесплатный разбор заново.':'Сохранённая анкета не подходит для этой версии. Она не показана. Удалите данные сайта в настройках браузера и начните заново.';return;}
+var lines=['Relationship Reset — ваша анкета','Номер случая: '+cid,'Заполнено: '+new Date(obj.ts).toLocaleString('ru-RU'),'Это не подтверждение оплаты или заказа.',''];
+Object.keys(fieldLabels).forEach(function(key){var answer=choiceLabels[key]?choiceLabels[key][obj.data[key]]:obj.data[key];lines.push(fieldLabels[key]+': '+(answer||'Не указано'));});
+document.getElementById('intake').value=lines.join('\n');
+document.getElementById('caseLine').textContent='Номер случая: '+cid;
+document.getElementById('stateMsg').textContent='Завершённая анкета доступна только в этой вкладке. Она никуда не отправлена.';
+document.getElementById('intakeArea').hidden=false;
+}
+document.getElementById('copyBtn').addEventListener('click',async function(){
+var textarea=document.getElementById('intake'),status=document.getElementById('copyStatus');if(!textarea.value){status.textContent='Нет анкеты для копирования.';return;}
+var copied=false;try{if(navigator.clipboard&&typeof navigator.clipboard.writeText==='function'){await navigator.clipboard.writeText(textarea.value);copied=true;}}catch(e){}
+if(!copied){textarea.focus();textarea.select();textarea.setSelectionRange(0,textarea.value.length);try{copied=document.execCommand('copy')===true;}catch(e){copied=false;}}
+status.textContent=copied?'Анкета скопирована. Она никуда не отправлена.':'Автоматически скопировать не удалось. Текст выделен: выберите «Копировать» в меню вашего устройства.';
+});
+document.getElementById('eraseBtn').addEventListener('click',function(){var removed=clearSavedCase();hideIntake();document.getElementById('stateMsg').textContent=removed?'Анкета и номер случая удалены из этой вкладки. Скопированный ранее текст нужно удалить отдельно.':'Анкета скрыта, но браузер не позволил очистить хранилище. Удалите данные этого сайта в настройках браузера.';});
+window.addEventListener('pageshow',loadIntake);
+loadIntake();
 </script></body></html>
