@@ -29,7 +29,7 @@ details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:750;
 <div class="eyebrow">A clearer next step after conflict</div>
 <h1>You had a fight. What should you do next?</h1>
 <p>Stop guessing whether to text, apologize, give space, or try to talk again. Start with a short diagnostic and get one concrete next move based on what actually happened.</p>
-<a class="btn" href="#diagnostic">Start the free diagnostic</a>
+<a class="btn" id="startDiagnostic" href="#diagnostic">Start the free diagnostic</a>
 <p class="tiny">You can start alone. Your partner does not need to sign up.</p>
 </header>
 
@@ -58,7 +58,7 @@ details{border-top:1px solid var(--line);padding:14px 0}summary{font-weight:750;
 <div class="q"><h3>One safety check</h3><p class="tiny">Does this involve physical violence, threats, stalking, forced sexual contact, fear for anyone’s safety, or controlling access to money, movement, communication, or support?</p><div class="opts" data-name="safety"></div></div>
 <div class="actions"><button type="button" class="btn secondary" id="back" disabled>Back</button><button type="button" class="btn" id="next">Next</button></div>
 </form>
-<div class="result" id="result"><div id="resultContent"></div></div>
+<div class="result" id="result" aria-live="polite"><div id="resultContent"></div></div>
 </div>
 </section>
 
@@ -112,7 +112,8 @@ function show(){qs.forEach(function(q,i){q.classList.toggle('active',i===idx)});
 function valid(){var req=[].slice.call(qs[idx].querySelectorAll('[required]'));if(!req.length)return true;if(req[0].type==='radio')return req.some(function(x){return x.checked});return req.every(function(x){return x.value.trim().length>0});}
 function value(n){var e=document.querySelector('[name="'+n+'"]:checked')||document.querySelector('[name="'+n+'"]');return e?e.value:''}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
-function caseId(){var old=sessionStorage.getItem('rr_case');if(old)return old;var a=new Uint8Array(12);crypto.getRandomValues(a);var id='m1_'+Array.from(a,function(b){return b.toString(16).padStart(2,'0')}).join('');sessionStorage.setItem('rr_case',id);return id}
+function caseId(){var a=new Uint8Array(12);crypto.getRandomValues(a);var id='m1_'+Array.from(a,function(b){return b.toString(16).padStart(2,'0')}).join('');sessionStorage.setItem('rr_case',id);return id}
+function resetDiagnostic(){sessionStorage.removeItem('rr_case');sessionStorage.removeItem('rr_diag');form.reset();idx=0;form.style.display='block';result.classList.remove('show');resultContent.innerHTML='';show();setTimeout(function(){document.getElementById('diagnostic').scrollIntoView({behavior:'smooth',block:'start'})},0)}
 function attribution(){var src=new URLSearchParams(location.search),out={};['utm_source','utm_medium','utm_campaign','utm_content','utm_term','creator_code','wedge'].forEach(function(k){var v=src.get(k);if(v)out[k]=v.slice(0,150).replace(/[^A-Za-z0-9_-]/g,'_')});return out}
 function checkout(id){var u=new URL(CHECKOUT);u.searchParams.set('client_reference_id',id);var a=attribution();Object.keys(a).forEach(function(k){u.searchParams.set(k,a[k])});return u.toString()}
 function move(d){
@@ -128,7 +129,7 @@ function finish(){
  var id=caseId();sessionStorage.setItem('rr_diag',JSON.stringify({data:d,ts:new Date().toISOString()}));
  form.style.display='none';result.classList.add('show');
  if(d.safety==='Yes / unsure'){
-  resultContent.innerHTML='<div class="block danger"><h4>Safety comes first</h4><p>The situation you described may involve safety, coercion, or fear. A normal relationship recommendation may not be appropriate here. Prioritize immediate safety and consider qualified local support. If you are in immediate danger, contact local emergency services. Relationship Reset should not guide confrontation or reconciliation in this situation.</p></div>';return;
+  resultContent.innerHTML='<div class="block danger"><h4>Safety comes first</h4><p>The situation you described may involve safety, coercion, or fear. A normal relationship recommendation may not be appropriate here. Prioritize immediate safety and consider qualified local support. If you are in immediate danger, contact local emergency services. Relationship Reset should not guide confrontation or reconciliation in this situation.</p></div><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button>';return;
  }
  var m=move(d);
  resultContent.innerHTML=
@@ -138,10 +139,11 @@ function finish(){
  '<div class="block"><h4>Today’s move</h4><p>'+esc(m.action)+'</p></div>'+
  '<div class="block"><h4>Words, if useful</h4><p>“'+esc(m.words)+'”</p></div>'+
  '<div class="block"><h4>Why this move</h4><p>It is designed to reduce pressure while matching the immediate goal you selected: '+esc(d.goal.toLowerCase())+'.</p></div>'+
- '<div class="offer"><div class="price">$149</div><div class="tiny">one-time · 30 days · no auto-renewal</div><h3>Continue with the 30-Day Relationship Reset</h3><p class="muted">A personalized situation profile, Situation Solver, practical wording, outcome check-ins, and plan adjustments based on what actually happens.</p><a class="btn" target="_blank" rel="noopener" href="'+checkout(id)+'">Continue to test checkout</a><div class="test">Sandbox only. This opens Stripe test checkout and cannot collect a real payment. Case reference: '+esc(id)+'</div></div>';
+ '<div class="offer"><div class="price">$149</div><div class="tiny">one-time · 30 days · no auto-renewal</div><h3>Continue with the 30-Day Relationship Reset</h3><p class="muted">A personalized situation profile, Situation Solver, practical wording, outcome check-ins, and plan adjustments based on what actually happens.</p><a class="btn" target="_blank" rel="noopener" href="'+checkout(id)+'">Continue to test checkout</a><div class="test">Sandbox only. This opens Stripe test checkout and cannot collect a real payment. Case reference: '+esc(id)+'</div><div style="margin-top:12px"><button type="button" class="btn secondary" onclick="resetDiagnostic()">Start over</button></div></div>';
 }
 next.onclick=function(){if(!valid()){alert('Please answer this question before continuing.');return}if(idx<qs.length-1){idx++;show()}else finish()};
 back.onclick=function(){if(idx>0){idx--;show()}};
+document.getElementById('startDiagnostic').onclick=function(){resetDiagnostic()};
 show();
 </script>
 </body>
