@@ -20,9 +20,13 @@ Completed STANDARD cases are stored in `sessionStorage` under `rr_case` and `rr_
 
 `success.html` validates the schema, case ID, enumerated answers, date and safety mode before displaying intake. It rejects legacy or malformed cases and never treats URL payment parameters as evidence.
 
+## Seller decision — 25 September 2026
+
+The user confirmed that his wife agrees to become the actual seller of the pilot, take responsibility for delivery/support/refunds, and publish the seller name and INN supplied in the Prodamus form. Seller: София Мурмановна Липартелиани; INN 760605353023. Her NPD status is user-reported, not independently verified. This decision supersedes the earlier founder-only seller plan; she is not merely a nominal payment recipient. Relationship Reset remains the product brand.
+
 ## Before accepting money
 
-Founder/seller registration and identity, provider approval for this service and buyer geography, actual support/intake channel, final terms/refunds/privacy/retention, and a verified payment-to-delivery test remain open. Do not add a payment URL before these are resolved. Confirm a manual payment verification process (status, amount/currency, customer, case and duplicate check) for this bounded pilot. Do not substitute a redirect for payment verification.
+Seller identity is published. Confirmation of her current NPD status, provider approval for this service and buyer geography, actual support/intake channel, final terms/refunds/privacy/retention, and a verified payment-to-delivery test remain open. Do not add a payment URL before these are resolved. Confirm a manual payment verification process (status, amount/currency, customer, case and duplicate check) for this bounded pilot. Do not substitute a redirect for payment verification.
 
 Pilot measurements and price changes are manual. This site does not count purchases or switch to RUB 2,490 automatically. Update all public price text before offering the fourth paid order. No paid advertising is authorized by this change.
 
