@@ -17,6 +17,7 @@ data class AppConfig(
     val trustedProxyIps: Set<String> = emptySet(),
     val allowLoopbackHttp: Boolean = false,
     val release: String? = null,
+    val clientOrigin: String = "https://api-staging.poslessory.ru",
 ) {
     companion object {
         fun fromEnvironment(env: Map<String, String> = System.getenv()): AppConfig {

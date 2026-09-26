@@ -21,7 +21,9 @@ DOMAIN = "api-staging.poslessory.ru"
 MYSQL_IMAGE = "mysql:8.4@sha256:0744ee5ef89ce6ccfa13de3e579fe6b9e27f93dd70da9c06d2c908b1b193fb8d"
 DATABASE = "rr_kotlin_stage"
 TABLES = ("rr_cases", "rr_drafts", "rr_schema_migrations")
-DOCKER = ["docker", "--host", "unix:///var/run/docker.sock"]
+CLIENT_TABLES = ("rr_client_invitations", "rr_client_sessions", "rr_client_cases", "rr_client_reviews")
+DOCKER_CONFIG = Path("/var/lib/relationship-reset-kotlin-staging-deploy/docker-config")
+DOCKER = ["docker", "--config", str(DOCKER_CONFIG), "--host", "unix:///var/run/docker.sock"]
 
 # The password never enters host arguments, output, or host-side Python memory.
 # A bounded client command lets the shell run its cleanup even on SQL failure.
@@ -135,11 +137,19 @@ class Database:
     def query(self, sql):
         return self.execute("mysql", "--batch", "--skip-column-names", "--execute", sql)
 
-    def require_tables(self, name):
+    def require_tables(self, name, expected=None):
         require(name == DATABASE or re.fullmatch(r"rr_restore_test_[a-f0-9]{24}", name), "database_name")
         result = self.query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA='"
                             + name + "' ORDER BY TABLE_NAME")
-        require(result.decode().splitlines() == list(TABLES), "expected_three_tables")
+        tables = tuple(result.decode().splitlines())
+        # Retain partially applied additive tables in a backup too. This is a
+        # recovery aid, not proof that the client migration is complete.
+        require(set(TABLES).issubset(tables) and set(tables).issubset(set(TABLES + CLIENT_TABLES)),
+                "unexpected_staging_tables")
+        require(len(tables) == len(set(tables)), "duplicate_table_names")
+        if expected is not None:
+            require(tables == expected, "restored_table_set_differs")
+        return tables
 
     def require_plain_schema(self):
         # This pinned release has no programmable SQL objects. Reject unexpected
@@ -150,14 +160,14 @@ class Database:
                                + " WHERE " + column + "='" + DATABASE + "'")
             require(count.strip() == b"0", "unexpected_programmable_schema_objects")
 
-    def fingerprint(self, name, directory):
+    def fingerprint(self, name, directory, tables):
         # Deterministic data-only SQL includes every column/value, ordered by PK.
         # These temporary files are private and removed even if a command fails.
         with tempfile.TemporaryFile(dir=directory) as output:
             self.execute("mysqldump", "--single-transaction", "--no-create-info", "--skip-triggers",
                          "--skip-comments", "--compact", "--skip-extended-insert", "--complete-insert",
                          "--order-by-primary", "--hex-blob", "--no-tablespaces", "--set-gtid-purged=OFF",
-                         "--skip-add-locks", "--skip-disable-keys", "--tz-utc", name, *TABLES, stdout=output)
+                         "--skip-add-locks", "--skip-disable-keys", "--tz-utc", name, *tables, stdout=output)
             require(output.tell() > 0, "nonempty_data_snapshot")
             output.seek(0)
             digest = hashlib.sha256()
@@ -169,9 +179,9 @@ class Database:
 def verify_backup(db, directory, restore):
     require(re.fullmatch(r"rr_restore_test_[a-f0-9]{24}", restore), "restore_name")
     require(restore != DATABASE, "restore_separate")
-    db.require_tables(DATABASE)
+    tables = db.require_tables(DATABASE)
     db.require_plain_schema()
-    before = db.fingerprint(DATABASE, directory)
+    before = db.fingerprint(DATABASE, directory, tables)
     partial = directory / "staging.sql.partial"
     dump = directory / "staging.sql"
     with partial.open("xb") as output:
@@ -186,9 +196,10 @@ def verify_backup(db, directory, restore):
     db.query("CREATE DATABASE `" + restore + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     with dump.open("rb") as source:
         db.execute("mysql", "--binary-mode", restore, stdin=source)
-    db.require_tables(restore)
-    restored = db.fingerprint(restore, directory)
-    after = db.fingerprint(DATABASE, directory)
+    db.require_tables(restore, tables)
+    restored = db.fingerprint(restore, directory, tables)
+    db.require_tables(DATABASE, tables)
+    after = db.fingerprint(DATABASE, directory, tables)
     require(before == after, "staging_changed_during_backup_retry_when_idle")
     require(before == restored, "restored_values_differ")
     # Retain the restore DB for inspection; there is deliberately no DROP command.
@@ -200,6 +211,8 @@ def main():
     os.umask(0o077)
     for directory in (Path("/opt"), INSTALL, APP):
         protected(directory, directory=True)
+    protected(DOCKER_CONFIG.parent, directory=True, mode=0o700)
+    protected(DOCKER_CONFIG, directory=True, mode=0o700)
     protected(APP / ".env", mode=0o600)
     settings = re.fullmatch(r"RR_RELEASE=([a-f0-9]{40})\nRR_DOMAIN=" + re.escape(DOMAIN) + r"\n",
                             (APP / ".env").read_text())
@@ -232,7 +245,7 @@ def main():
             print("Backup verification stopped. Preserved private artifacts: " + str(directory), file=sys.stderr)
             print("Possible retained restore database: " + restore, file=sys.stderr)
             raise
-        print("PASS private backup restored; every value in all three tables matches; staging unchanged.")
+        print("PASS private backup restored; every value in all captured tables matches; staging unchanged.")
         print("Backup: " + str(dump))
         print("Restore database retained: " + restore)
 

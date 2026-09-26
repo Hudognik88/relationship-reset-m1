@@ -101,11 +101,14 @@ class DeploymentBoundaryTests(unittest.TestCase):
                     deploy.validate_candidate_tree(baseline, candidate)
 
     def test_added_migration_is_not_an_automatic_application_update(self):
-        baseline = baseline_tree()
-        candidate = copy.deepcopy(baseline)
-        candidate["backend/migrations/002_next.sql"] = ("100644", "blob", "f" * 40)
-        with self.assertRaises(deploy.DeployFailure):
-            deploy.validate_candidate_tree(baseline, candidate)
+        for path in ("backend/migrations/002_next.sql",
+                     "backend-kotlin/src/main/resources/client-migrations/002_client_rehearsal.sql"):
+            with self.subTest(path=path):
+                baseline = baseline_tree()
+                candidate = copy.deepcopy(baseline)
+                candidate[path] = ("100644", "blob", "f" * 40)
+                with self.assertRaises(deploy.DeployFailure):
+                    deploy.validate_candidate_tree(baseline, candidate)
 
     def test_symlinks_and_submodules_in_source_are_rejected(self):
         for mode, kind in (("120000", "blob"), ("160000", "commit")):

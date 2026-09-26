@@ -47,9 +47,7 @@ jobs:
       - name: Validate VPS setup helpers
         run: |
           bash -n backend-kotlin/scripts/install-vps.sh
-          python3 -m py_compile backend-kotlin/scripts/smoke-vps.py
-          python3 -m py_compile backend-kotlin/scripts/backup-vps.py
-          python3 -m py_compile backend-kotlin/scripts/autodeploy-vps.py backend-kotlin/scripts/setup-autodeploy-vps.py
+          python3 -m py_compile backend-kotlin/scripts/*.py
           python3 -m unittest discover -s backend-kotlin/tests -p 'test_*.py' -v
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5; official ref verified
         with:

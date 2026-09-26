@@ -21,6 +21,8 @@ UNIT = 'relationship-reset-kotlin-deploy'
 FILES = {
     'autodeploy-vps.py': 'backend-kotlin/scripts/autodeploy-vps.py',
     'smoke-vps.py': 'backend-kotlin/scripts/smoke-vps.py',
+    'smoke-client-vps.py': 'backend-kotlin/scripts/smoke-client-vps.py',
+    'client-admin-vps.py': 'backend-kotlin/scripts/client-admin-vps.py',
     'backup-vps.py': 'backend-kotlin/scripts/backup-vps.py',
     'Dockerfile': 'backend-kotlin/Dockerfile',
     'Dockerfile.dockerignore': 'backend-kotlin/Dockerfile.dockerignore',
@@ -144,6 +146,9 @@ def main():
         require(blob(baseline, path) == blob(infra, path), 'Infrastructure requires manual update: ' + path)
     require(git('rev-parse', baseline + ':backend/migrations') == git('rev-parse', infra + ':backend/migrations'),
             'Schema changes require a separate migration')
+    client_migrations = 'backend-kotlin/src/main/resources/client-migrations'
+    require(git('ls-tree', baseline, '--', client_migrations) == git('ls-tree', infra, '--', client_migrations),
+            'Client schema changes require a separate migration')
     sources = {name: blob(baseline, path) for name, path in FILES.items()}
     for name, source in sources.items():
         if name.endswith('.py'):

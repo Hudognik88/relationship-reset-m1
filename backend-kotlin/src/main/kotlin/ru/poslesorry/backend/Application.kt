@@ -17,15 +17,15 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     try {
-        require(args.isEmpty() || args.contentEquals(arrayOf("migrate")))
+        require(args.isEmpty() || args.contentEquals(arrayOf("migrate")) || args.contentEquals(arrayOf("migrate-client")))
         val config = AppConfig.fromEnvironment()
         val ds = dataSource(config.database)
         if (args.isNotEmpty()) {
-            ds.use { Migrations(it).run() }
+            ds.use { Migrations(it).run(); if (args[0] == "migrate-client") ClientMigrations(it).run() }
             println("Schema ready.")
         } else {
             val server = embeddedServer(Netty, host = config.host, port = config.port) {
-                api(config, JdbcCaseStore(ds))
+                api(config, JdbcCaseStore(ds), JdbcClientStore(ds))
                 monitor.subscribe(ApplicationStopped) { ds.close() }
             }
             server.start(wait = true)
@@ -37,7 +37,8 @@ fun main(args: Array<String>) {
     }
 }
 
-fun Application.api(config: AppConfig, store: CaseStore) {
+fun Application.api(config: AppConfig, store: CaseStore, clientStore: ClientStore? = null) {
+    if (clientStore != null) clientApi(config, clientStore)
     routing {
         route("/api/health.php") {
             handle {

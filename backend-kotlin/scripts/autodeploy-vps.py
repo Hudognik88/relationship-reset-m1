@@ -43,6 +43,7 @@ FROZEN = frozenset({WORKFLOW_PATH, ".dockerignore", "backend-kotlin/.dockerignor
                     "backend-kotlin/Dockerfile", "backend-kotlin/Dockerfile.dockerignore",
                     "backend-kotlin/compose.yaml", "backend-kotlin/Caddyfile",
                     "backend-kotlin/pom.xml", "backend-kotlin/scripts/smoke-vps.py",
+                    "backend-kotlin/scripts/smoke-client-vps.py", "backend-kotlin/scripts/client-admin-vps.py",
                     "backend-kotlin/scripts/autodeploy-vps.py", "backend-kotlin/scripts/backup-vps.py",
                     "backend-kotlin/scripts/setup-autodeploy-vps.py"})
 REQUIRED_FROZEN = FROZEN - {".dockerignore", "backend-kotlin/.dockerignore",
@@ -224,7 +225,8 @@ def tree_entries(release):
 
 def frozen_entries(entries):
     return {path: value for path, value in entries.items()
-            if path in FROZEN or path.startswith("backend/migrations/")}
+            if path in FROZEN or path.startswith("backend/migrations/")
+            or path.startswith("backend-kotlin/src/main/resources/client-migrations/")}
 
 
 def validate_candidate_tree(baseline, candidate):
@@ -254,6 +256,7 @@ def validate_trusted_assets(baseline):
     for name, source in (("Dockerfile", "backend-kotlin/Dockerfile"),
                          ("compose.yaml", "backend-kotlin/compose.yaml"),
                          ("smoke-vps.py", "backend-kotlin/scripts/smoke-vps.py"),
+                         ("smoke-client-vps.py", "backend-kotlin/scripts/smoke-client-vps.py"),
                          ("autodeploy-vps.py", "backend-kotlin/scripts/autodeploy-vps.py"),
                          ("backup-vps.py", "backend-kotlin/scripts/backup-vps.py")):
         protected(OPS / name)
@@ -323,6 +326,8 @@ def write_env(release):
 def verify_release(release):
     run(["python3", str(OPS / "smoke-vps.py"), "--release", release,
          "--secret-dir", str(APP / ".secrets")], timeout=120, capture=False)
+    run(["python3", str(OPS / "smoke-client-vps.py"), "--release", release,
+         "--secret-dir", str(APP / ".secrets")], timeout=180, capture=False)
 
 
 def validate_runtime(release, expected_image):
@@ -462,6 +467,7 @@ def validate_host(config):
     protected(BACKUPS, directory=True, mode=0o700)
     protected(OPS / "compose.yaml")
     protected(OPS / "smoke-vps.py")
+    protected(OPS / "smoke-client-vps.py")
     protected(OPS / "Dockerfile")
     protected(APP / ".secrets", directory=True, mode=0o700)
     for name, mode in (("operator-token", 0o600), ("operator-token.sha256", 0o444),
