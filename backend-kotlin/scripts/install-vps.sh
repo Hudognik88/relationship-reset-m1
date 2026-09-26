@@ -4,7 +4,7 @@
 set -Eeuo pipefail
 umask 077
 
-readonly RR_RELEASE='694c290139b59cfe8174da8af05fbf62a834d0d5'
+readonly RR_RELEASE='5504aba9644f9ca38583b63e69b1a3d414b2a7ef'
 readonly RR_DOMAIN='api-staging.poslessory.ru'
 readonly RR_REPOSITORY='https://github.com/Hudognik88/relationship-reset-m1.git'
 readonly RR_INSTALL='/opt/relationship-reset-kotlin-staging'
