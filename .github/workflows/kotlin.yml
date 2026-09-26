@@ -48,6 +48,7 @@ jobs:
         run: |
           bash -n backend-kotlin/scripts/install-vps.sh
           python3 -m py_compile backend-kotlin/scripts/smoke-vps.py
+          python3 -m py_compile backend-kotlin/scripts/backup-vps.py
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5; official ref verified
         with:
           distribution: temurin
@@ -88,7 +89,9 @@ jobs:
         env:
           RR_DOMAIN: kotlin-staging.example.invalid
           RR_RELEASE: ${{ github.sha }}
-        run: docker compose -f backend-kotlin/compose.yaml config --quiet
+        run: |
+          docker compose -f backend-kotlin/compose.yaml config --format json \
+            | python3 backend-kotlin/scripts/validate-compose-network.py
       - name: Build deployment container
         env:
           RELEASE_SHA: ${{ github.sha }}

@@ -91,6 +91,8 @@ networks:
     ipam:
       config:
         - subnet: 172.30.0.0/24
+          # Keep dynamic API/migration endpoints away from Caddy's trusted static IP.
+          ip_range: 172.30.0.128/25
   database:
     internal: true
 
