@@ -1,0 +1,98 @@
+name: Kotlin API compatibility and container
+
+on:
+  push:
+    branches: [kotlin-backend-20260926]
+    paths:
+      - 'backend-kotlin/**'
+      - 'backend/migrations/**'
+      - '.github/workflows/kotlin.yml'
+  pull_request:
+    paths:
+      - 'backend-kotlin/**'
+      - 'backend/migrations/**'
+      - '.github/workflows/kotlin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kotlin-api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4@sha256:0744ee5ef89ce6ccfa13de3e579fe6b9e27f93dd70da9c06d2c908b1b193fb8d
+        env:
+          MYSQL_ROOT_PASSWORD: disposable-ci-root-only
+          MYSQL_DATABASE: rr_kotlin_test
+          MYSQL_USER: rr_kotlin_test
+          MYSQL_PASSWORD: disposable-ci-password-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5; official ref verified
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5; official ref verified
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: backend-kotlin/pom.xml
+      - name: Install pinned Maven and PHP compatibility runtime
+        run: |
+          curl --fail --silent --show-error --location \
+            --connect-timeout 15 --max-time 90 \
+            https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.9/apache-maven-3.9.9-bin.tar.gz \
+            --output "$RUNNER_TEMP/apache-maven-3.9.9-bin.tar.gz"
+          printf '%s  %s\n' \
+            a555254d6b53d267965a3404ecb14e53c3827c09c3b94b5678835887ab404556bfaf78dcfe03ba76fa2508649dca8531c74bca4d5846513522404d48e8c4ac8b \
+            "$RUNNER_TEMP/apache-maven-3.9.9-bin.tar.gz" | sha512sum --check --status
+          tar -xzf "$RUNNER_TEMP/apache-maven-3.9.9-bin.tar.gz" -C "$RUNNER_TEMP"
+          printf '%s\n' "$RUNNER_TEMP/apache-maven-3.9.9/bin" >> "$GITHUB_PATH"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq php8.3-cli php8.3-mysql
+      - name: Verify API contract and MySQL integration
+        env:
+          RR_TEST_DB_HOST: 127.0.0.1
+          RR_TEST_DB_PORT: '3306'
+          RR_TEST_DB_NAME: rr_kotlin_test
+          RR_TEST_DB_USER: rr_kotlin_test
+          RR_TEST_DB_PASSWORD: disposable-ci-password-only
+          RR_TEST_PHP_BINARY: php8.3
+        run: mvn -B -ntp -f backend-kotlin/pom.xml verify
+      - name: Exercise packaged JAR over HTTP
+        env:
+          RR_TEST_DB_HOST: 127.0.0.1
+          RR_TEST_DB_PORT: '3306'
+          RR_TEST_DB_NAME: rr_kotlin_test
+          RR_TEST_DB_USER: rr_kotlin_test
+          RR_TEST_DB_PASSWORD: disposable-ci-password-only
+        run: python3 backend-kotlin/scripts/smoke.py
+      - name: Validate staging Compose configuration
+        env:
+          RR_DOMAIN: kotlin-staging.example.invalid
+          RR_RELEASE: ${{ github.sha }}
+        run: docker compose -f backend-kotlin/compose.yaml config --quiet
+      - name: Build deployment container
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: docker build --file backend-kotlin/Dockerfile --tag "relationship-reset-api:$RELEASE_SHA" .
+      - name: Validate reverse proxy configuration
+        run: >-
+          docker run --rm --env RR_DOMAIN=kotlin-staging.example.invalid
+          --mount "type=bind,source=$PWD/backend-kotlin/Caddyfile,target=/etc/caddy/Caddyfile,readonly"
+          caddy:2.11.4-alpine@sha256:6aeddd44c3078b0f9a35206472a11420648a79c184603ef95957d0a20044cb2b
+          caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+    # Build and test only: no registry push, deployment credentials or hosting changes.

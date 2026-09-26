@@ -1,0 +1,15 @@
+{
+	admin off
+}
+
+{$RR_DOMAIN} {
+	# Only the API lives here. The existing landing page stays on its current host.
+	@api path /api/index.php /api/health.php
+	handle @api {
+		reverse_proxy api:8080 {
+			# Overwrite client-supplied values. The API trusts only this proxy's fixed IP.
+			header_up X-Forwarded-Proto https
+		}
+	}
+	respond 404
+}
