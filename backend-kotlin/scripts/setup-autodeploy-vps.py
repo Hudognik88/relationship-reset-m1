@@ -150,7 +150,7 @@ def main():
             compile(source, name, 'exec')
 
     protected(Path('/var/backups'), directory=True)
-    for path in (OPS, CONFIG_DIR, STATE, BACKUP_ROOT, BACKUP_ROOT / 'autodeploy'):
+    for path in (OPS, CONFIG_DIR, STATE, STATE / 'docker-config', BACKUP_ROOT, BACKUP_ROOT / 'autodeploy'):
         if not path.exists():
             path.mkdir(mode=0o700)
         protected(path, directory=True, mode=0o700)

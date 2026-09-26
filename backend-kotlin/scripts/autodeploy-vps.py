@@ -32,7 +32,11 @@ OPS = Path("/opt/relationship-reset-kotlin-deployer")
 CONFIG = Path("/etc/relationship-reset-kotlin-staging/autodeploy.json")
 STATE = Path("/var/lib/relationship-reset-kotlin-staging-deploy")
 BACKUPS = Path("/var/backups/relationship-reset-kotlin-staging/autodeploy")
-DOCKER = ["docker", "--host", "unix:///var/run/docker.sock"]
+DOCKER_CONFIG = STATE / "docker-config"
+# Buildx writes state beside Docker's config file. A fixed private directory
+# works with systemd ProtectHome=true without exposing /root or inheriting a
+# caller's Docker context, credentials store, or remote daemon configuration.
+DOCKER = ["docker", "--config", str(DOCKER_CONFIG), "--host", "unix:///var/run/docker.sock"]
 SHA = re.compile(r"[a-f0-9]{40}")
 IMAGE_ID = re.compile(r"sha256:[a-f0-9]{64}")
 FROZEN = frozenset({WORKFLOW_PATH, ".dockerignore", "backend-kotlin/.dockerignore",
@@ -454,6 +458,7 @@ def validate_host(config):
     for path in (Path("/opt"), INSTALL, APP, OPS, CONFIG.parent, STATE, BACKUPS):
         protected(path, directory=True)
     protected(STATE, directory=True, mode=0o700)
+    protected(DOCKER_CONFIG, directory=True, mode=0o700)
     protected(BACKUPS, directory=True, mode=0o700)
     protected(OPS / "compose.yaml")
     protected(OPS / "smoke-vps.py")

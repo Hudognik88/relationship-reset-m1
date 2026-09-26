@@ -6,8 +6,10 @@ import io
 import json
 from pathlib import Path
 import subprocess
+import stat
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -278,6 +280,78 @@ class SecretRedactionTests(unittest.TestCase):
                 deploy.run(["synthetic-command"])
         self.assertEqual(str(failure.exception), "command_unavailable_or_timeout")
         self.assertNotIn(secret, str(failure.exception))
+
+
+class IsolatedDockerConfigTests(unittest.TestCase):
+    def test_build_inspect_compose_backup_and_rollback_avoid_root_home_config(self):
+        expected = ["docker", "--config", str(deploy.STATE / "docker-config"),
+                    "--host", "unix:///var/run/docker.sock"]
+        seen = []
+        image = "sha256:" + "1" * 64
+        with tempfile.TemporaryDirectory() as directory, contextlib.ExitStack() as stack:
+            root = Path(directory)
+            for name in ("STATE", "OPS", "APP", "BACKUPS"):
+                path = root / name.lower()
+                path.mkdir(mode=0o700)
+                stack.enter_context(patch.object(deploy, name, path))
+            (deploy.OPS / "Dockerfile").write_text("FROM scratch\n")
+            stack.enter_context(patch.object(deploy, "protected"))
+
+            def command(argv, **kwargs):
+                self.assertEqual(argv[:len(expected)], expected)
+                tail = argv[len(expected):]
+                seen.append(tuple(tail[:2]))
+                if tail[:2] == ["image", "inspect"]:
+                    return (image + "\n").encode()
+                if tail[0] == "ps":
+                    return b"bbbbbbbbbbbb\n" if any("service=mysql" in v for v in tail) else b"aaaaaaaaaaaa\n"
+                if tail[0] == "inspect":
+                    metadata = {"Config": {"Image": "relationship-reset-api:" + SHA, "Labels": {
+                        "com.docker.compose.project.working_dir": str(deploy.APP)}},
+                        "Image": image, "State": {"Running": True}, "HostConfig": {"PortBindings": {}},
+                        "Mounts": [
+                            {"Destination": "/run/secrets/db_root_password", "Type": "bind", "RW": False,
+                             "Source": str(deploy.APP / ".secrets/db-root-password")},
+                            {"Destination": "/var/lib/mysql", "Type": "volume",
+                             "Name": deploy.PROJECT + "_mysql_data"}]}
+                    return json.dumps([metadata]).encode()
+                if tail[0] == "exec":
+                    kwargs["stdout"].write(b"-- synthetic dump\n")
+                return b""
+
+            stack.enter_context(patch.object(deploy, "run", side_effect=command))
+            source = "backend-kotlin/src/main/kotlin/Application.kt"
+            with patch.object(deploy, "blob", return_value=b"fun main() {}\n"), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(deploy.build_image(SHA, {source: ("100644", "blob", SHA)}, [source]), image)
+            deploy.compose("up", "--no-deps", "api")
+            deploy.validate_runtime(SHA, image)
+            self.assertGreater(deploy.private_backup(SHA).stat().st_size, 0)
+            with patch.object(deploy, "write_env"), patch.object(deploy, "verify_release"), \
+                 patch.object(deploy, "validate_runtime"), patch.object(deploy, "atomic_json"), \
+                 patch.object(deploy, "clear_transaction"), contextlib.redirect_stdout(io.StringIO()):
+                deploy.rollback_transaction({"version": 1, "phase": "switched", "previous_release": OTHER_SHA,
+                    "candidate_release": SHA, "previous_image": image, "candidate_image": "sha256:" + "2" * 64})
+        self.assertEqual({part[0] for part in seen}, {"build", "image", "compose", "ps", "inspect", "exec"})
+        self.assertIn(("image", "tag"), seen)
+
+    def test_validate_host_requires_private_docker_config_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = Path(directory) / "docker-config"
+            real_protected = deploy.protected
+
+            def validate(path, **kwargs):
+                if path == config_path:
+                    self.assertEqual(kwargs, {"directory": True, "mode": 0o700})
+                    real_protected(path, **kwargs)
+
+            config = {"version": 1, "enabled": True, "baseline_sha": SHA, "infra_sha": SHA}
+            with patch.object(deploy, "DOCKER_CONFIG", config_path), \
+                 patch.object(deploy, "protected", side_effect=validate), \
+                 patch.object(Path, "lstat", return_value=SimpleNamespace(st_uid=0, st_mode=stat.S_IFDIR | 0o755)), \
+                 patch.object(deploy, "run") as command:
+                with self.assertRaisesRegex(deploy.DeployFailure, "^unexpected_host_permissions$"):
+                    deploy.validate_host(config)
+                command.assert_not_called()
 
 
 if __name__ == "__main__":
