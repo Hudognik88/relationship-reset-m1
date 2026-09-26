@@ -49,6 +49,8 @@ jobs:
           bash -n backend-kotlin/scripts/install-vps.sh
           python3 -m py_compile backend-kotlin/scripts/smoke-vps.py
           python3 -m py_compile backend-kotlin/scripts/backup-vps.py
+          python3 -m py_compile backend-kotlin/scripts/autodeploy-vps.py backend-kotlin/scripts/setup-autodeploy-vps.py
+          python3 -m unittest discover -s backend-kotlin/tests -p 'test_*.py' -v
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5; official ref verified
         with:
           distribution: temurin
@@ -102,4 +104,4 @@ jobs:
           --mount "type=bind,source=$PWD/backend-kotlin/Caddyfile,target=/etc/caddy/Caddyfile,readonly"
           caddy:2.11.4-alpine@sha256:6aeddd44c3078b0f9a35206472a11420648a79c184603ef95957d0a20044cb2b
           caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-    # Build and test only: no registry push, deployment credentials or hosting changes.
+    # VPS polls this exact workflow's successful push run; no deploy credentials in Actions.

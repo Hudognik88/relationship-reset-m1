@@ -101,6 +101,29 @@ def identify_container():
     return item["Id"]
 
 
+def validate_runtime_revision(release):
+    infra = run(["git", "-C", str(INSTALL), "rev-parse", "HEAD"]).decode().strip()
+    if infra == release:
+        return
+    # Pull deployment changes only the API image; the audited infrastructure
+    # checkout remains fixed. Validate both identities instead of checking out code.
+    config_path = Path("/etc/relationship-reset-kotlin-staging/autodeploy.json")
+    protected(config_path.parent, directory=True, mode=0o700)
+    protected(config_path, mode=0o600)
+    config = json.loads(config_path.read_text())
+    require(config.get("version") == 1 and config.get("infra_sha") == infra,
+            "pinned_infrastructure")
+    ids = run(DOCKER + ["ps", "-q", "--filter", "label=com.docker.compose.project=" + PROJECT,
+                        "--filter", "label=com.docker.compose.service=api"]).decode().split()
+    require(len(ids) == 1 and re.fullmatch(r"[a-f0-9]{12,64}", ids[0]), "api_container_identity")
+    api = json.loads(run(DOCKER + ["inspect", ids[0]]))[0]
+    environment = dict(item.split("=", 1) for item in api["Config"]["Env"] if "=" in item)
+    require(api["Config"]["Image"] == "relationship-reset-api:" + release
+            and environment.get("RR_RELEASE") == release
+            and api["Config"]["Labels"].get("com.docker.compose.project.working_dir") == str(APP)
+            and api["State"]["Running"], "api_release_identity")
+
+
 class Database:
     def __init__(self, container):
         self.container = container
@@ -184,7 +207,7 @@ def main():
     release = settings.group(1)
     protected(APP / ".secrets", directory=True, mode=0o700)
     protected(APP / ".secrets/db-root-password", mode=0o444)
-    require(run(["git", "-C", str(INSTALL), "rev-parse", "HEAD"]).decode().strip() == release, "pinned_checkout")
+    validate_runtime_revision(release)
     for directory in (Path("/var"), Path("/var/backups")):
         protected(directory, directory=True)
     if not BACKUPS.exists():
