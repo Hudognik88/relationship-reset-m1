@@ -1,0 +1,110 @@
+name: relationship-reset-kotlin-staging
+
+services:
+  caddy:
+    image: caddy:2.11.4-alpine@sha256:6aeddd44c3078b0f9a35206472a11420648a79c184603ef95957d0a20044cb2b
+    restart: unless-stopped
+    environment:
+      RR_DOMAIN: ${RR_DOMAIN:?Set a dedicated staging API domain}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      edge: {}
+      proxy:
+        ipv4_address: 172.30.0.2
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: [no-new-privileges:true]
+
+  api:
+    image: relationship-reset-api:${RR_RELEASE:?Set the tested 40-character commit SHA}
+    build:
+      context: ..
+      dockerfile: backend-kotlin/Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      RR_ENVIRONMENT: staging
+      RR_HOST: 0.0.0.0
+      RR_PORT: "8080"
+      RR_RELEASE: ${RR_RELEASE:?Set the tested 40-character commit SHA}
+      RR_TRUSTED_PROXY_IPS: 172.30.0.2
+      RR_OPERATOR_TOKEN_SHA256_FILE: /run/secrets/operator_token_sha256
+      RR_DB_HOST: mysql
+      RR_DB_PORT: "3306"
+      RR_DB_NAME: rr_kotlin_stage
+      RR_DB_USER: rr_kotlin_stage
+      RR_DB_PASSWORD_FILE: /run/secrets/db_password
+      # MySQL's generated certificate encrypts this private container connection.
+      # An external database requires VERIFY_IDENTITY with a trusted certificate.
+      RR_DB_SSL_MODE: REQUIRED
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=65 -XX:+ExitOnOutOfMemoryError -Djava.io.tmpdir=/tmp
+    secrets: [operator_token_sha256, db_password]
+    networks: [proxy, database]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m,uid=10001,gid=10001
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    stop_grace_period: 30s
+    # Deliberately no published port: only Caddy reaches this service.
+
+  mysql:
+    image: mysql:8.4@sha256:0744ee5ef89ce6ccfa13de3e579fe6b9e27f93dd70da9c06d2c908b1b193fb8d
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: rr_kotlin_stage
+      MYSQL_USER: rr_kotlin_stage
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    secrets: [db_password, db_root_password]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks: [database]
+    healthcheck:
+      test: [CMD, mysqladmin, ping, --host=127.0.0.1, --silent]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 20
+    # Deliberately no published database port.
+
+networks:
+  edge: {}
+  proxy:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          # Keep dynamic API/migration endpoints away from Caddy's trusted static IP.
+          ip_range: 172.30.0.128/25
+  database:
+    internal: true
+
+volumes:
+  mysql_data:
+  caddy_data:
+  caddy_config:
+
+secrets:
+  operator_token_sha256:
+    file: ./.secrets/operator-token.sha256
+  db_password:
+    file: ./.secrets/db-password
+  db_root_password:
+    file: ./.secrets/db-root-password

@@ -1,0 +1,9 @@
+# Dockerfile-specific allowlist: no site data, credentials or build outputs enter context.
+**
+!backend-kotlin/
+!backend-kotlin/pom.xml
+!backend-kotlin/src/
+!backend-kotlin/src/**
+!backend/
+!backend/migrations/
+!backend/migrations/*.sql

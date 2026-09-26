@@ -1,0 +1,15 @@
+{
+	admin off
+}
+
+{$RR_DOMAIN} {
+	# Dedicated test API and invitation-only rehearsal. No landing-page changes.
+	@api path /api/index.php /api/health.php /client/* /rehearsal /rehearsal/*
+	handle @api {
+		reverse_proxy api:8080 {
+			# Overwrite client-supplied values. The API trusts only this proxy's fixed IP.
+			header_up X-Forwarded-Proto https
+		}
+	}
+	respond 404
+}

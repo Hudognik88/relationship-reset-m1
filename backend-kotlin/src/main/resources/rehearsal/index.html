@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Тестовый кабинет — После ссоры</title>
+  <link rel="stylesheet" href="/rehearsal/style.css">
+  <script src="/rehearsal/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <div class="app-shell">
+    <header class="masthead">
+      <a class="brand" href="/rehearsal/" aria-label="После ссоры — тестовый кабинет">
+        <span class="brand-mark" aria-hidden="true">п</span>
+        <span>После ссоры<span class="brand-caption">Место для спокойного следующего шага</span></span>
+      </a>
+      <span class="test-label"><span aria-hidden="true"></span> Тестовый кабинет</span>
+    </header>
+
+    <div class="layout">
+      <aside class="intro" aria-label="О тестовом кабинете">
+        <span class="eyebrow">Небольшой шаг к ясности</span>
+        <h1>Сначала понять.<br>Потом —<br><span>выбрать шаг.</span></h1>
+        <p>Здесь можно пройти путь от вымышленной ситуации до письменного разбора.</p>
+        <ol class="journey">
+          <li><span>01</span><div><strong>Описать ситуацию</strong><p>Несколько вопросов, без спешки.</p></div></li>
+          <li><span>02</span><div><strong>Дождаться проверки</strong><p>Разбор появится после проверки человеком.</p></div></li>
+          <li><span>03</span><div><strong>Прочитать в кабинете</strong><p>Вернуться к тексту в своём темпе.</p></div></li>
+        </ol>
+        <div class="quiet-note"><span aria-hidden="true">✳</span><p>Сейчас мы проверяем, удобно ли всё устроено. Используйте только вымышленные примеры.</p></div>
+      </aside>
+
+      <main id="main" class="workspace" tabindex="-1">
+        <div class="test-notice"><span class="notice-symbol" aria-hidden="true">i</span><p><strong>Тестовый кабинет.</strong> Используйте только вымышленные данные. Оплата не требуется.</p></div>
+        <noscript><div class="message error">Для работы кабинета нужен JavaScript. Включите его в настройках браузера и обновите страницу.</div></noscript>
+        <div id="global-message" class="message" role="status" aria-live="polite" hidden></div>
+
+        <section id="login-view" class="panel" aria-labelledby="login-heading">
+          <div class="panel-topline"><span class="eyebrow">Вход по приглашению</span><span class="small-mark" aria-hidden="true">↗</span></div>
+          <h2 id="login-heading" tabindex="-1">Попробуем вместе?</h2>
+          <p class="lead">Введите код приглашения, чтобы открыть свой тестовый кабинет.</p>
+          <form id="login-form" novalidate>
+            <div class="field">
+              <label for="invitation">Код приглашения</label>
+              <input id="invitation" name="invitation" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="256" placeholder="Код от организатора теста" aria-describedby="invitation-help login-error">
+              <p id="invitation-help" class="field-help">Код выдаёт организатор теста. Он действует 1 час. Не добавляйте его в адрес страницы.</p>
+            </div>
+            <p id="login-error" class="field-error" role="alert" hidden></p>
+            <button id="login-button" class="button primary full" type="submit">Открыть кабинет <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="panel-footnote">Без оплаты и подписки. Только проверка тестового сценария.</div>
+        </section>
+
+        <section id="form-view" class="panel" aria-labelledby="form-heading" hidden>
+          <div class="panel-topline"><span class="eyebrow">Вымышленная ситуация</span><button class="text-button logout-button" type="button">Выйти</button></div>
+          <p class="session-info" aria-live="polite"></p>
+          <div class="step-meta"><span id="step-count">Шаг 1 из 4</span><span id="step-caption">Перед началом</span></div>
+          <ol class="step-track" aria-label="Этапы анкеты">
+            <li aria-current="step"><span class="sr-only">Перед началом</span></li><li><span class="sr-only">Что произошло</span></li><li><span class="sr-only">Реакции и цель</span></li><li><span class="sr-only">Что уже пробовали</span></li>
+          </ol>
+          <form id="case-form" novalidate>
+            <section class="form-step" data-step="0" aria-labelledby="form-heading">
+              <h2 id="form-heading" tabindex="-1">Начнём с двух вопросов</h2>
+              <p class="lead">Они помогут понять, подходит ли вам этот тестовый формат.</p>
+              <fieldset class="field"><legend>Вам уже исполнилось 18 лет?</legend><div class="choice-grid" data-choices="age"></div></fieldset>
+              <fieldset class="field"><legend>В описываемой ситуации есть угрозы, насилие, преследование, принуждение, страх за безопасность или риск причинить вред себе?</legend><div class="choice-grid" data-choices="safety"></div></fieldset>
+            </section>
+            <section class="form-step" data-step="1" aria-labelledby="context-heading" hidden>
+              <h2 id="context-heading" tabindex="-1">Что произошло?</h2>
+              <p class="lead">Немного контекста для вымышленного примера.</p>
+              <div class="field"><label for="stage">Как долго длятся отношения?</label><select id="stage" name="stage" required data-options="stage"></select></div>
+              <fieldset class="field"><legend>Когда произошла ссора?</legend><div class="choice-grid compact" data-choices="timing"></div></fieldset>
+              <div class="field"><label for="boundary">Что партнёр говорит о контакте?</label><select id="boundary" name="boundary" required data-options="boundary"></select></div>
+              <div class="field"><div class="label-row"><label for="situation">Опишите вымышленную ситуацию</label><span class="counter" id="situation-count">0 / 2000</span></div><textarea id="situation" name="situation" maxlength="2000" rows="5" required placeholder="Например: пара поссорилась из-за отменённых планов. Один хочет поговорить, другой попросил паузу…" aria-describedby="situation-help situation-count"></textarea><p id="situation-help" class="field-help">Что стало поводом и чем закончился разговор? Не указывайте реальные имена, контакты или чужую переписку.</p></div>
+            </section>
+            <section class="form-step" data-step="2" aria-labelledby="reaction-heading" hidden>
+              <h2 id="reaction-heading" tabindex="-1">Как вы отреагировали?</h2>
+              <p class="lead">Отвечайте от лица героев вашего примера. Выберите то, что ближе.</p>
+              <div class="field"><label for="partner">Как повёл себя партнёр?</label><select id="partner" name="partner" required data-options="partner"></select></div>
+              <div class="field"><label for="user">Что сделали вы?</label><select id="user" name="user" required data-options="user"></select></div>
+              <fieldset class="field"><legend>Такое повторяется?</legend><div class="choice-grid compact" data-choices="recurrence"></div></fieldset>
+              <div class="field"><label for="goal">Что сейчас хотелось бы прояснить?</label><select id="goal" name="goal" required data-options="goal"></select></div>
+            </section>
+            <section class="form-step" data-step="3" aria-labelledby="attempt-heading" hidden>
+              <h2 id="attempt-heading" tabindex="-1">Что уже пробовали?</h2>
+              <p class="lead">Учтём прошлые попытки. Дополнительные примеры можно пропустить.</p>
+              <div class="field"><label for="helpful">Что раньше помогало?</label><select id="helpful" name="helpful" required data-options="helpful"></select></div>
+              <div class="field"><div class="label-row"><label for="success">Пример удачной попытки <span class="optional">необязательно</span></label><span class="counter" id="success-count">0 / 1000</span></div><textarea id="success" name="success" maxlength="1000" rows="3" placeholder="Что вы сделали и что изменилось?" aria-describedby="success-count"></textarea></div>
+              <div class="field"><label for="failureType">Какая попытка не помогла?</label><select id="failureType" name="failureType" required data-options="failureType"></select></div>
+              <div class="field"><div class="label-row"><label for="failure">Что произошло после неё? <span class="optional">необязательно</span></label><span class="counter" id="failure-count">0 / 1000</span></div><textarea id="failure" name="failure" maxlength="1000" rows="3" placeholder="Например: после нового сообщения напряжение выросло." aria-describedby="failure-count"></textarea></div>
+              <label class="confirmation"><input id="fictional-confirmation" type="checkbox" required><span>Подтверждаю: все ответы вымышлены, реальных личных данных здесь нет.</span></label>
+            </section>
+            <p id="form-error" class="field-error" role="alert" hidden></p>
+            <div class="form-actions"><button id="back-button" class="button secondary" type="button" hidden>← Назад</button><button id="next-button" class="button primary" type="submit">Продолжить <span aria-hidden="true">→</span></button></div>
+            <p class="form-note">Ответы сохранятся после отправки. До этого они находятся только в открытой вкладке.</p>
+          </form>
+        </section>
+
+        <section id="stop-view" class="panel" aria-labelledby="stop-heading" hidden>
+          <span class="eyebrow">Перед началом</span><h2 id="stop-heading" tabindex="-1">Этот формат не подойдёт</h2><p id="stop-reason" class="lead"></p><p>Анкета не отправлена. Описание ситуации здесь вводить не нужно.</p><div class="form-actions"><button id="gate-back-button" class="button secondary" type="button">Вернуться к вопросам</button><button class="text-button logout-button" type="button">Выйти</button></div>
+        </section>
+
+        <section id="case-view" class="panel" aria-labelledby="case-heading" hidden>
+          <div class="panel-topline"><span class="eyebrow">Мой тестовый пример</span><button class="text-button logout-button" type="button">Выйти</button></div>
+          <p class="session-info" aria-live="polite"></p>
+          <div id="waiting-content"><div class="status-illustration" aria-hidden="true"><span>✓</span><i></i><i></i></div><span class="status-pill">На проверке</span><h2 id="case-heading" tabindex="-1">Анкета сохранена.</h2><p class="lead">Разбор появится здесь после проверки.</p><p class="muted">Можно закрыть вкладку и вернуться позже. Для продолжения используйте этот же браузер, пока действует вход в кабинет.</p></div>
+          <div id="review-content" hidden><span class="status-pill ready">Разбор готов</span><h2 id="review-heading" tabindex="-1">Ваш следующий шаг</h2><p class="muted">Письменный разбор прошёл проверку перед публикацией.</p><div id="review-text" class="review-text"></div></div>
+          <details class="saved-case"><summary>Моя вымышленная ситуация</summary><p id="saved-situation"></p></details>
+          <p id="case-error" class="field-error" role="alert" hidden></p>
+          <button id="refresh-button" class="button secondary full" type="button">Проверить, появился ли разбор</button>
+          <div class="delete-area"><button id="delete-button" class="text-button danger" type="button">Удалить тестовый пример</button><div id="delete-confirmation" class="delete-confirmation" hidden><h3 id="delete-heading" tabindex="-1">Удалить этот пример?</h3><p>Анкета и разбор будут удалены из кабинета и рабочей базы. Ранее созданные резервные копии сохраняются.</p><div class="form-actions"><button id="cancel-delete-button" class="button secondary" type="button">Оставить</button><button id="confirm-delete-button" class="button danger-button" type="button">Удалить пример</button></div></div></div>
+        </section>
+        <footer class="workspace-footer"><span>После ссоры</span><span>Один спокойный шаг за раз</span></footer>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
