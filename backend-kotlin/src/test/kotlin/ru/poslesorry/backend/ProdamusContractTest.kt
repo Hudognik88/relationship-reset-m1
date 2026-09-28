@@ -168,6 +168,21 @@ class ProdamusContractTest {
     }
 
     @Test
+    fun `PF2 UUID is signed verbatim then canonicalized while PF1 numeric ids remain unchanged`() {
+        val uuid = "019EA75C-B41C-7B83-BDDD-7369A7071F97"
+        val wire = parse(notificationFields().plus("order_id" to uuid).entries.joinToString("&") { "${it.key}=${it.value}" })
+        val sign = ProdamusContract.signature(wire, secret)
+        assertTrue(ProdamusContract.verify(wire, secret, sign))
+        val normalized = ProdamusContract.notification(wire)
+        assertEquals(uuid.lowercase(), normalized.providerOrderId)
+        assertFalse(ProdamusContract.verify(JsonObject(wire + ("order_id" to JsonPrimitive(uuid.lowercase()))), secret, sign))
+        assertEquals("123456", ProdamusContract.canonicalProviderOrderId("123456"))
+        for (invalid in listOf("019ea75c-b41c-7b83-bddd-7369a7071f9", "019ea75c-b41c-7b83-bddd-7369a7071f977", "019ea75c-b41c-7b83-bddd-7369a7071f9g", "{019ea75c-b41c-7b83-bddd-7369a7071f97}", "019ea75cb41c7b83bddd7369a7071f97", " 019ea75c-b41c-7b83-bddd-7369a7071f97", "1-2-3-4-5", "01")) {
+            assertFailsWith<IllegalArgumentException>(invalid) { ProdamusContract.notification(json(notificationFields() + ("order_id" to invalid))) }
+        }
+    }
+
+    @Test
     fun `notification rejects missing critical fields wrong merchant malformed ids amounts currencies and states`() {
         for (name in listOf("order_num", "order_id", "domain", "sum", "currency", "payment_status")) {
             assertFailsWith<IllegalArgumentException>(name) { ProdamusContract.notification(json(notificationFields() - name)) }

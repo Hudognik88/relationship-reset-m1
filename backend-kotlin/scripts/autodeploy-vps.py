@@ -46,6 +46,7 @@ FROZEN = frozenset({WORKFLOW_PATH, ".dockerignore", "backend-kotlin/.dockerignor
                     "backend-kotlin/scripts/smoke-client-vps.py", "backend-kotlin/scripts/client-admin-vps.py",
                     "backend-kotlin/scripts/smoke-workspace-vps.py",
                     "backend-kotlin/scripts/smoke-payments-vps.py",
+                    "backend-kotlin/scripts/configure-prodamus-demo-vps.py",
                     "backend-kotlin/scripts/autodeploy-vps.py", "backend-kotlin/scripts/backup-vps.py",
                     "backend-kotlin/scripts/setup-autodeploy-vps.py"})
 REQUIRED_FROZEN = FROZEN - {".dockerignore", "backend-kotlin/.dockerignore",
@@ -261,6 +262,7 @@ def validate_trusted_assets(baseline):
                          ("smoke-client-vps.py", "backend-kotlin/scripts/smoke-client-vps.py"),
                          ("smoke-workspace-vps.py", "backend-kotlin/scripts/smoke-workspace-vps.py"),
                          ("smoke-payments-vps.py", "backend-kotlin/scripts/smoke-payments-vps.py"),
+                         ("configure-prodamus-demo-vps.py", "backend-kotlin/scripts/configure-prodamus-demo-vps.py"),
                          ("client-admin-vps.py", "backend-kotlin/scripts/client-admin-vps.py"),
                          ("autodeploy-vps.py", "backend-kotlin/scripts/autodeploy-vps.py"),
                          ("backup-vps.py", "backend-kotlin/scripts/backup-vps.py")):
@@ -336,7 +338,47 @@ def verify_release(release):
     run(["python3", str(OPS / "smoke-workspace-vps.py"), "--release", release,
          "--secret-dir", str(APP / ".secrets")], timeout=180, capture=False)
     run(["python3", str(OPS / "smoke-payments-vps.py"), "--release", release,
-         "--secret-dir", str(APP / ".secrets")], timeout=120, capture=False)
+         "--expect-mode", payment_mode()], timeout=120, capture=False)
+
+
+def payment_document(raw):
+    """Validate a tiny private file without putting its contents in diagnostics."""
+    require(isinstance(raw, bytes) and len(raw) <= 2048, "payment_configuration_size")
+    def unique(pairs):
+        value = {}
+        for key, item in pairs:
+            require(key not in value, "payment_configuration_duplicate")
+            value[key] = item
+        return value
+    try:
+        value = json.loads(raw.decode("ascii"), object_pairs_hook=unique)
+    except DeployFailure:
+        raise
+    except Exception:
+        raise DeployFailure("payment_configuration_format") from None
+    require(isinstance(value, dict) and type(value.get("version")) is int and value["version"] == 1,
+            "payment_configuration_version")
+    mode = value.get("mode")
+    require(mode in ("disabled", "demo"), "payment_configuration_mode")
+    if mode == "disabled":
+        require(set(value) == {"version", "mode"}, "partial_payment_configuration")
+    else:
+        require(set(value) in ({"version", "mode", "secret"}, {"version", "mode", "secret", "sys"}),
+                "payment_configuration_fields")
+        require(isinstance(value.get("secret"), str)
+                and re.fullmatch(r"[!-~]{16,256}", value["secret"]), "payment_configuration_secret")
+        require("sys" not in value or isinstance(value["sys"], str)
+                and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", value["sys"]), "payment_configuration_sys")
+    return value
+
+
+def payment_mode():
+    protected(APP / ".secrets", directory=True, mode=0o700)
+    path = APP / ".secrets/prodamus-demo.json"
+    protected(path, mode=0o444)
+    require(path.stat().st_size <= 2048, "payment_configuration_size")
+    with path.open("rb") as source:
+        return payment_document(source.read(2049))["mode"]
 
 
 def validate_runtime(release, expected_image):
@@ -348,6 +390,14 @@ def validate_runtime(release, expected_image):
             and metadata["Config"]["Image"] == "relationship-reset-api:" + release
             and metadata["Image"] == expected_image and metadata["State"]["Running"]
             and not metadata["HostConfig"].get("PortBindings"), "api_runtime_identity")
+    environment = dict(item.split("=", 1) for item in metadata["Config"]["Env"] if "=" in item)
+    require({key: value for key, value in environment.items() if key.startswith("RR_PRODAMUS_")}
+            == {"RR_PRODAMUS_CONFIG_FILE": "/run/secrets/prodamus_demo"}, "payment_environment_boundary")
+    mounts = {item["Destination"]: item for item in metadata["Mounts"]}
+    secret = mounts.get("/run/secrets/prodamus_demo", {})
+    require(secret.get("Type") == "bind" and secret.get("Source") == str(APP / ".secrets/prodamus-demo.json")
+            and secret.get("RW") is False, "payment_mount_boundary")
+    payment_mode()
 
 
 def private_backup(release):
@@ -479,12 +529,14 @@ def validate_host(config):
     protected(OPS / "smoke-client-vps.py")
     protected(OPS / "smoke-workspace-vps.py")
     protected(OPS / "smoke-payments-vps.py")
+    protected(OPS / "configure-prodamus-demo-vps.py")
     protected(OPS / "client-admin-vps.py")
     protected(OPS / "Dockerfile")
     protected(APP / ".secrets", directory=True, mode=0o700)
     for name, mode in (("operator-token", 0o600), ("operator-token.sha256", 0o444),
                        ("db-password", 0o444), ("db-root-password", 0o444), ("smoke-fixture.json", 0o600)):
         protected(APP / ".secrets" / name, mode=mode)
+    payment_mode()
     for pattern in ("compose.override.*", "docker-compose*", ".env.*"):
         require(not list(APP.glob(pattern)), "unexpected_local_override")
     require(run(["git", "-C", str(INSTALL), "rev-parse", "HEAD"]).decode().strip() == config["infra_sha"],
@@ -513,6 +565,9 @@ def main():
         protected(lock, mode=0o600)
         for name in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
             signal.signal(name, interrupted)
+        for name in ("client-upgrade.json", "workspace-upgrade.json", "payments-upgrade.json",
+                     "demo-config-upgrade.json", "demo-configuration.json"):
+            require(not (STATE / name).exists() and not (STATE / name).is_symlink(), "manual_recovery_required")
         recover_transaction()
         if config["enabled"] is False:
             print("WAIT autodeploy disabled.")

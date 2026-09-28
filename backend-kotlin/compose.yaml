@@ -49,8 +49,9 @@ services:
       # MySQL's generated certificate encrypts this private container connection.
       # An external database requires VERIFY_IDENTITY with a trusted certificate.
       RR_DB_SSL_MODE: REQUIRED
+      RR_PRODAMUS_CONFIG_FILE: /run/secrets/prodamus_demo
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=65 -XX:+ExitOnOutOfMemoryError -Djava.io.tmpdir=/tmp
-    secrets: [operator_token_sha256, db_password]
+    secrets: [operator_token_sha256, db_password, prodamus_demo]
     networks: [proxy, database]
     depends_on:
       mysql:
@@ -108,3 +109,5 @@ secrets:
     file: ./.secrets/db-password
   db_root_password:
     file: ./.secrets/db-root-password
+  prodamus_demo:
+    file: ./.secrets/prodamus-demo.json

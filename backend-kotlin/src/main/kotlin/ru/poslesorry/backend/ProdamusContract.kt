@@ -37,6 +37,8 @@ object ProdamusContract {
     private const val RETURN_URL = "https://api-staging.poslessory.ru/rehearsal/"
     private const val WEBHOOK_URL = "https://api-staging.poslessory.ru/payments/prodamus/webhook"
     private val orderPattern = Regex("rrstg_[a-f0-9]{32}")
+    private val numericProviderOrderPattern = Regex("[1-9][0-9]{0,19}")
+    private val uuidProviderOrderPattern = Regex("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
     private val segmentPattern = Regex("(?:[A-Za-z_][A-Za-z0-9_-]{0,63}|0|[1-9][0-9]{0,2})")
     private val rootPattern = Regex("[A-Za-z_][A-Za-z0-9_-]{0,63}")
     private val parameterPattern = Regex("([A-Za-z][A-Za-z0-9_-]*)=(?:\"([^\"]*)\"|([A-Za-z0-9!#$%&'*+.^_`|~-]+))")
@@ -93,6 +95,13 @@ object ProdamusContract {
         } catch (_: IllegalArgumentException) { false }
     }
 
+    /** Call after signature verification; wire values remain unchanged while signing. */
+    fun canonicalProviderOrderId(value: String): String {
+        require(numericProviderOrderPattern.matches(value) || uuidProviderOrderPattern.matches(value)) { "invalid_order_id" }
+        return value.lowercase(Locale.ROOT)
+    }
+
+    /** Extract normalized business fields only after verifying the unmodified parsed form. */
     fun notification(data: JsonObject): ProdamusNotification {
         fun field(name: String): String {
             val value = data[name] as? JsonPrimitive
@@ -101,8 +110,7 @@ object ProdamusContract {
         }
         val merchantOrder = field("order_num")
         require(orderPattern.matches(merchantOrder)) { "invalid_order_num" }
-        val providerOrder = field("order_id")
-        require(Regex("[1-9][0-9]{0,19}").matches(providerOrder)) { "invalid_order_id" }
+        val providerOrder = canonicalProviderOrderId(field("order_id"))
         val domain = field("domain")
         require(domain == MERCHANT_DOMAIN) { "invalid_domain" }
         val amount = field("sum")

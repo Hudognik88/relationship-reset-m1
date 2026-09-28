@@ -59,7 +59,7 @@ class JdbcPaymentStore(private val source: DataSource) : PaymentStore {
     }
 
     override fun accept(notification: ProdamusNotification, now: Instant) = transaction { db ->
-        validateNotification(notification)
+        val providerOrderId = validateNotification(notification)
         // Lookup is only a hint. Lock the immutable canonical account before locking its order,
         // exactly as create/delete/key rotation do. A locking reread avoids stale snapshots.
         val owner = db.prepareStatement("SELECT owner_session_id FROM rr_client_orders WHERE id = ?").use { q ->
@@ -72,16 +72,16 @@ class JdbcPaymentStore(private val source: DataSource) : PaymentStore {
         val order = findOrder(db, notification.merchantOrderId) ?: throw ApiProblem(404, "order_not_found")
         if (order.owner != owner || order.amount != notification.amountMinor || order.currency != notification.currency || order.mode != MODE || order.product != PRODUCT)
             throw ApiProblem(409, "payment_mismatch")
-        if (order.paidProvider != null && order.paidProvider != notification.providerOrderId) throw ApiProblem(409, "payment_conflict")
+        if (order.paidProvider != null && order.paidProvider != providerOrderId) throw ApiProblem(409, "payment_conflict")
         // No read-before-insert gap lock. This locks a globally unique provider transaction;
         // concurrent callbacks claiming it for another account can never both commit.
         db.prepareStatement("INSERT INTO rr_payment_receipts (provider_order_id, order_id, merchant_domain, amount_minor, currency, demo_mode, status, first_received_at, last_received_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE provider_order_id = VALUES(provider_order_id)").use { q ->
-            q.setString(1, notification.providerOrderId); q.setString(2, order.id); q.setString(3, notification.merchantDomain)
+            q.setString(1, providerOrderId); q.setString(2, order.id); q.setString(3, notification.merchantDomain)
             q.setLong(4, notification.amountMinor); q.setString(5, notification.currency); q.setBoolean(6, notification.demoMode)
             q.setString(7, notification.status); q.setTimestamp(8, Timestamp.from(now)); q.setTimestamp(9, Timestamp.from(now)); q.executeUpdate()
         }
         val previousStatus = db.prepareStatement("SELECT order_id, merchant_domain, amount_minor, currency, demo_mode, status FROM rr_payment_receipts WHERE provider_order_id = ? FOR UPDATE").use { q ->
-            q.setString(1, notification.providerOrderId); q.executeQuery().use { r ->
+            q.setString(1, providerOrderId); q.executeQuery().use { r ->
                 check(r.next())
                 if (r.getString("order_id") != order.id || r.getString("merchant_domain") != notification.merchantDomain || r.getLong("amount_minor") != notification.amountMinor || r.getString("currency") != notification.currency || r.getBoolean("demo_mode") != notification.demoMode)
                     throw ApiProblem(409, "payment_conflict")
@@ -90,14 +90,14 @@ class JdbcPaymentStore(private val source: DataSource) : PaymentStore {
         }
         if (previousStatus != "success") {
             db.prepareStatement("UPDATE rr_payment_receipts SET status = ?, last_received_at = ? WHERE provider_order_id = ?").use { q ->
-                q.setString(1, notification.status); q.setTimestamp(2, Timestamp.from(now)); q.setString(3, notification.providerOrderId); q.executeUpdate()
+                q.setString(1, notification.status); q.setTimestamp(2, Timestamp.from(now)); q.setString(3, providerOrderId); q.executeUpdate()
             }
         }
         // Already accepted success and later failure deliveries are stable acknowledgements.
         if (order.paidProvider != null || notification.status != "success") return@transaction Unit
         val deliverable = caseExists(db, owner, order.caseId)
         db.prepareStatement("UPDATE rr_client_orders SET status = ?, paid_provider_order_id = ?, paid_at = ? WHERE id = ? AND status = 'pending' AND paid_provider_order_id IS NULL").use { q ->
-            q.setString(1, if (deliverable) "paid" else "review_required"); q.setString(2, notification.providerOrderId)
+            q.setString(1, if (deliverable) "paid" else "review_required"); q.setString(2, providerOrderId)
             q.setTimestamp(3, Timestamp.from(now)); q.setString(4, order.id); check(q.executeUpdate() == 1)
         }
         if (deliverable) db.prepareStatement("INSERT INTO rr_client_entitlements (order_id, owner_session_id, case_id, starts_at, expires_at) VALUES (?, ?, ?, ?, ?)").use { q ->
@@ -107,11 +107,14 @@ class JdbcPaymentStore(private val source: DataSource) : PaymentStore {
         Unit
     }
 
-    private fun validateNotification(value: ProdamusNotification) {
-        if (!ORDER.matches(value.merchantOrderId) || !PROVIDER.matches(value.providerOrderId) || value.status !in STATUSES)
+    private fun validateNotification(value: ProdamusNotification): String {
+        val providerOrderId = try { ProdamusContract.canonicalProviderOrderId(value.providerOrderId) }
+            catch (_: IllegalArgumentException) { throw ApiProblem(422, "invalid_notification") }
+        if (!ORDER.matches(value.merchantOrderId) || value.status !in STATUSES)
             throw ApiProblem(422, "invalid_notification")
         if (value.merchantDomain != MERCHANT || !value.demoMode || value.amountMinor != AMOUNT || value.currency != CURRENCY)
             throw ApiProblem(409, "payment_mismatch")
+        return providerOrderId
     }
 
     private fun reserveRequest(db: Connection, owner: String, request: String, caseId: String, orderId: String, now: Instant) {
@@ -168,7 +171,6 @@ class JdbcPaymentStore(private val source: DataSource) : PaymentStore {
         private val REQUEST = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}")
         private val CASE = Regex("[a-f0-9]{32}")
         private val ORDER = Regex("rrstg_[a-f0-9]{32}")
-        private val PROVIDER = Regex("[1-9][0-9]{0,19}")
         private val STATUSES = setOf("success", "order_canceled", "order_denied")
         const val PRODUCT = "pilot_7d"
         const val AMOUNT = 99000L

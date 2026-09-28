@@ -298,6 +298,8 @@ class IsolatedDockerConfigTests(unittest.TestCase):
                 path.mkdir(mode=0o700)
                 stack.enter_context(patch.object(deploy, name, path))
             (deploy.OPS / "Dockerfile").write_text("FROM scratch\n")
+            (deploy.APP / ".secrets").mkdir(mode=0o700)
+            (deploy.APP / ".secrets/prodamus-demo.json").write_text('{"version":1,"mode":"disabled"}\n')
             stack.enter_context(patch.object(deploy, "protected"))
 
             def command(argv, **kwargs):
@@ -309,10 +311,13 @@ class IsolatedDockerConfigTests(unittest.TestCase):
                 if tail[0] == "ps":
                     return b"bbbbbbbbbbbb\n" if any("service=mysql" in v for v in tail) else b"aaaaaaaaaaaa\n"
                 if tail[0] == "inspect":
-                    metadata = {"Config": {"Image": "relationship-reset-api:" + SHA, "Labels": {
+                    metadata = {"Config": {"Image": "relationship-reset-api:" + SHA,
+                        "Env": ["RR_PRODAMUS_CONFIG_FILE=/run/secrets/prodamus_demo"], "Labels": {
                         "com.docker.compose.project.working_dir": str(deploy.APP)}},
                         "Image": image, "State": {"Running": True}, "HostConfig": {"PortBindings": {}},
                         "Mounts": [
+                            {"Destination": "/run/secrets/prodamus_demo", "Type": "bind", "RW": False,
+                             "Source": str(deploy.APP / ".secrets/prodamus-demo.json")},
                             {"Destination": "/run/secrets/db_root_password", "Type": "bind", "RW": False,
                              "Source": str(deploy.APP / ".secrets/db-root-password")},
                             {"Destination": "/var/lib/mysql", "Type": "volume",

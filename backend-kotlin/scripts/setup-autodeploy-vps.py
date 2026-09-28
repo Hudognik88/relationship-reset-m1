@@ -24,6 +24,7 @@ FILES = {
     'smoke-client-vps.py': 'backend-kotlin/scripts/smoke-client-vps.py',
     'smoke-workspace-vps.py': 'backend-kotlin/scripts/smoke-workspace-vps.py',
     'smoke-payments-vps.py': 'backend-kotlin/scripts/smoke-payments-vps.py',
+    'configure-prodamus-demo-vps.py': 'backend-kotlin/scripts/configure-prodamus-demo-vps.py',
     'client-admin-vps.py': 'backend-kotlin/scripts/client-admin-vps.py',
     'backup-vps.py': 'backend-kotlin/scripts/backup-vps.py',
     'Dockerfile': 'backend-kotlin/Dockerfile',
@@ -165,7 +166,9 @@ def main():
                         sort_keys=True, indent=2).encode() + b'\n'
     # Validate every existing destination before changing any managed file.
     writes = [(OPS / name, data, 0o700 if name.endswith('.py') else 0o600) for name, data in sources.items()]
-    writes += [(CONFIG_DIR / 'autodeploy.json', config, 0o600),
+    # This initial setup installs only the disabled placeholder, never a key.
+    writes += [(APP / '.secrets/prodamus-demo.json', b'{"version":1,"mode":"disabled"}\n', 0o444),
+               (CONFIG_DIR / 'autodeploy.json', config, 0o600),
                (Path('/etc/systemd/system') / (UNIT + '.service'), SERVICE.encode(), 0o644),
                (Path('/etc/systemd/system') / (UNIT + '.timer'), TIMER.encode(), 0o644)]
     for path, data, mode in writes:

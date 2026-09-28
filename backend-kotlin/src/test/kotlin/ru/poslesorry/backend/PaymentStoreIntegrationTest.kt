@@ -150,7 +150,8 @@ class PaymentStoreIntegrationTest {
 
     @Test
     fun `success grants exactly seven days and retries cannot extend or duplicate it`() {
-        val buyer = buyer(); val order = create(buyer); val n = notice(orderId(order))
+        val buyer = buyer(); val order = create(buyer); val provider = UUID.randomUUID().toString()
+        val n = notice(orderId(order), provider.uppercase())
         payments.accept(n, now)
         val accepted = payments.order(buyer.session.id, now)
         assertEquals("paid", status(accepted))
@@ -159,9 +160,18 @@ class PaymentStoreIntegrationTest {
         assertEquals(JsonPrimitive(buyer.caseId), entitlement["case_id"])
         assertEquals(JsonPrimitive(now.plusSeconds(604800).toString()), entitlement["expires_at"])
         assertEquals(JsonPrimitive(true), entitlement["active"])
-        payments.accept(n, now.plusSeconds(60)); payments.accept(n.copy(status = "order_canceled"), now.plusSeconds(61))
+        payments.accept(n.copy(providerOrderId = provider), now.plusSeconds(60))
+        payments.accept(n.copy(status = "order_canceled"), now.plusSeconds(61))
         assertEquals(accepted, payments.order(buyer.session.id, now.plusSeconds(62)))
         assertEquals(1, count("rr_client_entitlements", buyer.session.id)); assertEquals(1, count("rr_payment_receipts", buyer.session.id))
+        source.connection.use { db ->
+            db.prepareStatement("SELECT paid_provider_order_id FROM rr_client_orders WHERE id = ?").use { q ->
+                q.setString(1, orderId(order)); q.executeQuery().use { r -> assertTrue(r.next()); assertEquals(provider, r.getString(1)) }
+            }
+            db.prepareStatement("SELECT provider_order_id FROM rr_payment_receipts WHERE order_id = ?").use { q ->
+                q.setString(1, orderId(order)); q.executeQuery().use { r -> assertTrue(r.next()); assertEquals(provider, r.getString(1)); assertFalse(r.next()) }
+            }
+        }
         val expired = resumed(buyer.key, now.plusSeconds(604800))
         assertEquals(JsonPrimitive(false), payments.order(expired.id, now.plusSeconds(604800)).getValue("entitlement").jsonObject["active"])
         problem(409, "payment_conflict") { payments.accept(notice(orderId(order)), now.plusSeconds(100)) }
