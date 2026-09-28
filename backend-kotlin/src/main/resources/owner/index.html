@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer"><title>Кабинет автора — После ссоры</title><link rel="stylesheet" href="/owner/style.css"><script src="/owner/app.js" defer></script></head>
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <div class="app-shell owner-shell">
+    <header class="masthead"><a class="brand" href="/owner/" id="brand-link"><span class="brand-mark" aria-hidden="true">п</span><span>После ссоры<span class="brand-caption">Кабинет автора</span></span></a><span class="test-label"><span aria-hidden="true"></span> Только тестовые примеры</span></header>
+    <main id="main" tabindex="-1">
+      <div class="test-notice"><span class="notice-symbol" aria-hidden="true">i</span><p><strong>Тестовый кабинет автора.</strong> Только вымышленные анкеты и разборы. Реальные клиентские данные и платежи пока не принимаются.</p></div>
+      <noscript><div class="message error">Для работы кабинета нужен JavaScript.</div></noscript>
+      <div id="global-message" class="message" role="status" aria-live="polite" hidden></div>
+
+      <section id="login-view" class="panel owner-login" aria-labelledby="login-heading">
+        <span class="eyebrow">Проверка перед публикацией</span><h1 id="login-heading" tabindex="-1">Спокойный разбор<br>начинается здесь.</h1><p class="lead">Войдите по приглашению автора, чтобы прочитать анкеты и опубликовать проверенный текст.</p>
+        <form id="login-form" novalidate><div class="field"><label for="invitation">Приглашение автора</label><input id="invitation" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" required aria-describedby="invitation-help login-error" placeholder="Код для кабинета автора"><p id="invitation-help" class="field-help">Приглашение выдаётся на сервере и действует 10 минут. Клиентский код здесь не подойдёт.</p></div><p id="login-error" class="field-error" role="alert" hidden></p><button id="login-button" class="button primary full" type="submit">Войти в кабинет →</button></form>
+      </section>
+
+      <section id="workspace" hidden aria-label="Анкеты и разборы">
+        <div class="owner-toolbar"><div><span class="eyebrow">Кабинет автора</span><p id="session-info" class="muted"></p></div><button id="logout-button" class="button secondary" type="button">Выйти</button></div>
+        <div id="unsaved-warning" class="inline-warning unsaved-warning" hidden><h2 id="unsaved-heading" tabindex="-1">Есть неопубликованные изменения</h2><p>Если продолжить, текст в редакторе будет заменён или очищен. Скопируйте его, если хотите сохранить.</p><div class="form-actions"><button id="keep-editing-button" class="button primary" type="button">Продолжить редактирование</button><button id="discard-button" class="button secondary" type="button">Не сохранять и продолжить</button></div></div>
+        <div class="owner-layout">
+          <aside class="owner-sidebar">
+            <section class="panel queue-panel" aria-labelledby="queue-heading"><div class="panel-topline"><h2 id="queue-heading">Анкеты</h2><button id="refresh-queue-button" class="text-button" type="button">Обновить</button></div><p class="field-help queue-help">Последние 20 тестовых примеров</p><p id="queue-error" class="field-error" role="alert" hidden></p><p id="queue-empty" class="muted">Пока нет анкет.</p><div id="case-list" class="case-list" aria-label="Список анкет"></div></section>
+            <section class="panel invite-panel" aria-labelledby="invite-heading"><span class="eyebrow">Для тестового участника</span><h2 id="invite-heading">Новое приглашение</h2><p class="muted">Код открывает отдельный клиентский кабинет. Действует 1 час и показывается один раз.</p><button id="create-invitation-button" class="button secondary full" type="button">Создать клиентский код</button><p id="invite-error" class="field-error" role="alert" hidden></p><div id="invite-result" class="key-result" hidden><label for="client-invitation">Клиентское приглашение</label><textarea id="client-invitation" rows="3" readonly spellcheck="false" autocomplete="off"></textarea><p id="invite-expiry" class="field-help"></p><p class="field-help">Сохраните код перед закрытием. Передайте его участнику отдельно от ссылки на кабинет.</p><div class="invite-actions"><button id="copy-invitation-button" class="button secondary" type="button">Копировать</button><button id="hide-invitation-button" class="text-button" type="button">Код сохранён, скрыть</button></div></div></section>
+          </aside>
+          <div class="owner-content">
+            <section id="empty-editor" class="panel empty-editor"><span class="empty-symbol" aria-hidden="true">↗</span><h2>Выберите анкету</h2><p class="lead">Сначала прочитайте ответы, затем подготовьте разбор. Участник увидит его только после вашей проверки и публикации.</p></section>
+            <section id="editor-panel" class="panel" aria-labelledby="case-heading" hidden>
+              <div class="panel-topline"><div><span class="eyebrow">Вымышленная ситуация</span><h2 id="case-heading" tabindex="-1">Тестовый пример</h2><p id="case-date" class="field-help"></p></div><span id="case-status" class="status-pill">На проверке</span></div>
+              <details id="answers-details" class="answers-details" open><summary>Ответы участника</summary><dl id="answers" class="answers"></dl></details>
+              <form id="review-form" novalidate><div class="editor-heading"><div><span class="eyebrow">Письменный разбор</span><h3>Подготовьте следующий шаг</h3></div><span id="draft-state" class="draft-state" role="status">Без изменений</span></div><div class="field"><div class="label-row"><label for="review-text">Текст для участника</label><span id="review-count" class="counter">0 / 4000</span></div><textarea id="review-text" rows="13" maxlength="4000" required placeholder="Опишите, что можно понять из ситуации, и предложите один спокойный следующий шаг." aria-describedby="review-help review-error"></textarea><p id="review-help" class="field-help">Текст сохраняется только после публикации. До этого черновик остаётся в открытой вкладке.</p></div>
+                <details id="preview-details" class="preview-details"><summary>Предпросмотр для участника</summary><div id="review-preview" class="review-text">Здесь появится ваш текст.</div></details>
+                <label class="confirmation"><input id="reviewed-confirmation" type="checkbox" required><span>Я прочитал(а) анкету, проверил(а) разбор и готов(а) показать этот текст тестовому участнику.</span></label>
+                <div id="conflict-warning" class="inline-warning conflict-warning" hidden><h3>Разбор уже изменился</h3><p>Ваш черновик остался в редакторе. Скопируйте его перед загрузкой актуальной версии, затем сравните тексты и повторите проверку.</p><button id="reload-case-button" class="button secondary" type="button">Загрузить актуальную версию</button></div>
+                <p id="review-error" class="field-error" role="alert" hidden></p><div class="publish-row"><p id="publication-note" class="field-help">После публикации текст появится в кабинете участника.</p><button id="publish-button" class="button primary" type="submit">Опубликовать разбор</button></div>
+              </form>
+            </section>
+          </div>
+        </div>
+      </section>
+      <footer class="workspace-footer"><span>После ссоры · кабинет автора</span><span>Текст проверяет человек</span></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 {$RR_DOMAIN} {
 	# Dedicated test API and invitation-only rehearsal. No landing-page changes.
-	@api path /api/index.php /api/health.php /client/* /rehearsal /rehearsal/*
+	@api path /api/index.php /api/health.php /client/* /rehearsal /rehearsal/* /owner /owner/*
 	handle @api {
 		reverse_proxy api:8080 {
 			# Overwrite client-supplied values. The API trusts only this proxy's fixed IP.

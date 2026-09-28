@@ -49,6 +49,10 @@ jobs:
           bash -n backend-kotlin/scripts/install-vps.sh
           python3 -m py_compile backend-kotlin/scripts/*.py
           python3 -m unittest discover -s backend-kotlin/tests -p 'test_*.py' -v
+      - name: Validate browser scripts
+        run: |
+          node --check backend-kotlin/src/main/resources/rehearsal/app.js
+          node --check backend-kotlin/src/main/resources/owner/app.js
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5; official ref verified
         with:
           distribution: temurin

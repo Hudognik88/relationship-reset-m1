@@ -40,19 +40,29 @@
         <div id="global-message" class="message" role="status" aria-live="polite" hidden></div>
 
         <section id="login-view" class="panel" aria-labelledby="login-heading">
-          <div class="panel-topline"><span class="eyebrow">Вход по приглашению</span><span class="small-mark" aria-hidden="true">↗</span></div>
+          <div class="panel-topline"><span class="eyebrow">Личный тестовый кабинет</span><span class="small-mark" aria-hidden="true">↗</span></div>
           <h2 id="login-heading" tabindex="-1">Попробуем вместе?</h2>
-          <p class="lead">Введите код приглашения, чтобы открыть свой тестовый кабинет.</p>
+          <p id="login-description" class="lead">Введите код приглашения, чтобы открыть свой тестовый кабинет.</p>
+          <div class="login-modes" role="group" aria-label="Способ входа"><button id="invitation-mode" type="button" aria-pressed="true">Есть приглашение</button><button id="access-mode" type="button" aria-pressed="false">Вернуться в кабинет</button></div>
           <form id="login-form" novalidate>
-            <div class="field">
+            <div id="invitation-field" class="field">
               <label for="invitation">Код приглашения</label>
               <input id="invitation" name="invitation" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="256" placeholder="Код от организатора теста" aria-describedby="invitation-help login-error">
               <p id="invitation-help" class="field-help">Код выдаёт организатор теста. Он действует 1 час. Не добавляйте его в адрес страницы.</p>
             </div>
+            <div id="access-login-field" class="field" hidden><label for="access-login">Ключ кабинета</label><input id="access-login" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Ключ, который вы сохранили" aria-describedby="access-login-help login-error"><p id="access-login-help" class="field-help">Откроется тот же кабинет с вашей анкетой. Если ключ потерян и вы вышли, восстановление доступа пока недоступно.</p></div>
             <p id="login-error" class="field-error" role="alert" hidden></p>
             <button id="login-button" class="button primary full" type="submit">Открыть кабинет <span aria-hidden="true">→</span></button>
           </form>
           <div class="panel-footnote">Без оплаты и подписки. Только проверка тестового сценария.</div>
+        </section>
+
+        <section id="access-panel" class="access-panel" aria-labelledby="access-heading" hidden>
+          <div class="access-panel-top"><div><h2 id="access-heading">Чтобы вернуться позже</h2><p id="access-status">Сохраните ключ кабинета перед выходом.</p></div><button id="create-access-button" class="text-button" type="button">Сохранить ключ кабинета</button></div>
+          <div id="rotate-warning" class="inline-warning" hidden><h3 id="rotate-heading" tabindex="-1">Заменить ключ?</h3><p>Старый ключ перестанет работать. Входы в других браузерах будут завершены. Новый ключ нужно сохранить заново.</p><div class="form-actions"><button id="cancel-rotate-button" class="button secondary" type="button">Оставить прежний</button><button id="confirm-rotate-button" class="button primary" type="button">Создать новый ключ</button></div></div>
+          <div id="access-result" class="key-result" hidden><label for="access-key">Ваш ключ кабинета — показан один раз</label><textarea id="access-key" rows="3" readonly spellcheck="false" autocomplete="off" aria-describedby="access-key-help"></textarea><p id="access-key-help">Скопируйте и сохраните его у себя, например в менеджере паролей. Не отправляйте ключ другим и не добавляйте в адрес страницы. Потерянный ключ после выхода пока нельзя восстановить.</p><div class="form-actions"><button id="copy-access-button" class="button secondary" type="button">Копировать ключ</button><button id="saved-access-button" class="button primary" type="button">Я сохранил(а) ключ</button></div></div>
+          <p id="access-error" class="field-error" role="alert" hidden></p>
+          <div id="logout-warning" class="inline-warning" hidden><h3 id="logout-heading" tabindex="-1">Перед выходом проверьте ключ</h3><p>Убедитесь, что ключ сохранён у вас. Без него вы не сможете вернуться в этот кабинет после выхода. Восстановление доступа пока недоступно. Неотправленные ответы также будут очищены.</p><div class="form-actions"><button id="cancel-logout-button" class="button primary" type="button">Остаться в кабинете</button><button id="confirm-logout-button" class="button secondary" type="button">Всё равно выйти</button></div></div>
         </section>
 
         <section id="form-view" class="panel" aria-labelledby="form-heading" hidden>
@@ -107,7 +117,7 @@
         <section id="case-view" class="panel" aria-labelledby="case-heading" hidden>
           <div class="panel-topline"><span class="eyebrow">Мой тестовый пример</span><button class="text-button logout-button" type="button">Выйти</button></div>
           <p class="session-info" aria-live="polite"></p>
-          <div id="waiting-content"><div class="status-illustration" aria-hidden="true"><span>✓</span><i></i><i></i></div><span class="status-pill">На проверке</span><h2 id="case-heading" tabindex="-1">Анкета сохранена.</h2><p class="lead">Разбор появится здесь после проверки.</p><p class="muted">Можно закрыть вкладку и вернуться позже. Для продолжения используйте этот же браузер, пока действует вход в кабинет.</p></div>
+          <div id="waiting-content"><div class="status-illustration" aria-hidden="true"><span>✓</span><i></i><i></i></div><span class="status-pill">На проверке</span><h2 id="case-heading" tabindex="-1">Анкета сохранена.</h2><p class="lead">Разбор появится здесь после проверки.</p><p class="muted">Можно закрыть вкладку и вернуться позже. Сохраните ключ кабинета: он поможет открыть эту же анкету после выхода или в другом браузере.</p></div>
           <div id="review-content" hidden><span class="status-pill ready">Разбор готов</span><h2 id="review-heading" tabindex="-1">Ваш следующий шаг</h2><p class="muted">Письменный разбор прошёл проверку перед публикацией.</p><div id="review-text" class="review-text"></div></div>
           <details class="saved-case"><summary>Моя вымышленная ситуация</summary><p id="saved-situation"></p></details>
           <p id="case-error" class="field-error" role="alert" hidden></p>

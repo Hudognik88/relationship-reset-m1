@@ -85,6 +85,7 @@ def main():
     parser = argparse.ArgumentParser(description='Только тестовый кабинет и вымышленные данные.')
     commands = parser.add_subparsers(dest='command', required=True)
     commands.add_parser('invite', help='Одноразовый код приглашения; вывод только в терминал.')
+    commands.add_parser('owner-invite', help='Одноразовый вход в панель владельца на 10 минут; вывод только в терминал.')
     commands.add_parser('list', help='Последние тестовые анкеты.')
     show = commands.add_parser('show', help='Прочитать одну анкету.')
     show.add_argument('case_id')
@@ -96,14 +97,15 @@ def main():
     require(os.geteuid() == 0, 'Запускайте из терминала VPS от root.')
     if args.command in ('show', 'publish'):
         require(re.fullmatch('[a-f0-9]{32}', args.case_id), 'Неверный идентификатор анкеты.')
-    if args.command == 'invite':
+    if args.command in ('invite', 'owner-invite'):
         require(sys.stdout.isatty(), 'Код приглашения можно вывести только в интерактивный терминал.')
-        result = request('POST', '/client/operator/invitations', {'synthetic': True})
+        owner = args.command == 'owner-invite'
+        result = request('POST', '/client/operator/owner-invitations' if owner else '/client/operator/invitations', {'synthetic': True})
         token = result.get('invitation', '')
         require(isinstance(token, str) and re.fullmatch('[A-Za-z0-9_-]{43}', token),
                 'Неожиданный формат приглашения.')
-        print('Тестовый кабинет: ' + ORIGIN + '/rehearsal/')
-        print('Передайте код только приглашённому участнику теста. Не публикуйте его.')
+        print(('Панель владельца: ' + ORIGIN + '/owner/') if owner else ('Тестовый кабинет: ' + ORIGIN + '/rehearsal/'))
+        print('Этот код даёт доступ ко всем тестовым анкетам. Используйте его только для своего входа.' if owner else 'Передайте код только приглашённому участнику теста. Не публикуйте его.')
         print('Одноразовый код: ' + token)
         print('Действует до: ' + str(result.get('expires_at', '')))
     elif args.command == 'list':

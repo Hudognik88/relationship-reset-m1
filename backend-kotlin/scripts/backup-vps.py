@@ -22,6 +22,7 @@ MYSQL_IMAGE = "mysql:8.4@sha256:0744ee5ef89ce6ccfa13de3e579fe6b9e27f93dd70da9c06
 DATABASE = "rr_kotlin_stage"
 TABLES = ("rr_cases", "rr_drafts", "rr_schema_migrations")
 CLIENT_TABLES = ("rr_client_invitations", "rr_client_sessions", "rr_client_cases", "rr_client_reviews")
+WORKSPACE_TABLES = ("rr_client_access_keys", "rr_client_session_links", "rr_owner_invitations", "rr_owner_sessions")
 DOCKER_CONFIG = Path("/var/lib/relationship-reset-kotlin-staging-deploy/docker-config")
 DOCKER = ["docker", "--config", str(DOCKER_CONFIG), "--host", "unix:///var/run/docker.sock"]
 
@@ -144,7 +145,8 @@ class Database:
         tables = tuple(result.decode().splitlines())
         # Retain partially applied additive tables in a backup too. This is a
         # recovery aid, not proof that the client migration is complete.
-        require(set(TABLES).issubset(tables) and set(tables).issubset(set(TABLES + CLIENT_TABLES)),
+        require(set(TABLES).issubset(tables)
+                and set(tables).issubset(set(TABLES + CLIENT_TABLES + WORKSPACE_TABLES)),
                 "unexpected_staging_tables")
         require(len(tables) == len(set(tables)), "duplicate_table_names")
         if expected is not None:
@@ -235,7 +237,8 @@ def main():
         directory = Path(tempfile.mkdtemp(prefix=datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ-"), dir=BACKUPS))
         restore = "rr_restore_test_" + uuid.uuid4().hex[:24]
         metadata = directory / "verification.json"
-        state = {"verified": False, "release": release, "restore_database": restore}
+        state = {"verified": False, "release": release, "restore_database": restore,
+                 "tables": list(db.require_tables(DATABASE))}
         metadata.write_text(json.dumps(state) + "\n")
         try:
             dump = verify_backup(db, directory, restore)

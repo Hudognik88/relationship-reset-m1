@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
             println("Schema ready.")
         } else {
             val server = embeddedServer(Netty, host = config.host, port = config.port) {
-                api(config, JdbcCaseStore(ds), JdbcClientStore(ds))
+                api(config, JdbcCaseStore(ds), JdbcClientStore(ds), JdbcOwnerStore(ds))
                 monitor.subscribe(ApplicationStopped) { ds.close() }
             }
             server.start(wait = true)
@@ -37,8 +37,9 @@ fun main(args: Array<String>) {
     }
 }
 
-fun Application.api(config: AppConfig, store: CaseStore, clientStore: ClientStore? = null) {
-    if (clientStore != null) clientApi(config, clientStore)
+fun Application.api(config: AppConfig, store: CaseStore, clientStore: ClientStore? = null, ownerStore: OwnerStore? = null) {
+    if (clientStore != null) clientApi(config, clientStore, ownerStore = ownerStore)
+    if (ownerStore != null) ownerApi(config, ownerStore)
     routing {
         route("/api/health.php") {
             handle {
