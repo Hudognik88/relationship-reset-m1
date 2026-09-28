@@ -1,0 +1,16 @@
+{
+  "name": "relationship-reset-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TypeScript sources for the static Relationship Reset public frontend",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node frontend/build.mjs",
+    "build:check": "node frontend/build.mjs --check",
+    "typecheck": "tsc --project frontend/tsconfig.browser.json --noEmit && tsc --project frontend/tsconfig.landing.json --noEmit",
+    "test": "node --test tests/reset-logic.test.cjs tests/frontend-build.test.mjs tests/frontend-browser.test.cjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

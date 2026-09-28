@@ -1,86 +1,227 @@
 <!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#67449b">
-  <meta name="description" content="После ссоры — письменный разбор конкретной ситуации с проверкой человеком. Пилот: первый разбор и до двух корректировок за 7 дней, 990 ₽. Сейчас — только запись об интересе, без оплаты.">
-  <meta name="robots" content="noindex,follow">
-  <title>После ссоры — один спокойный следующий шаг</title>
-  <style>
-    :root{--ink:#272433;--muted:#66616e;--purple:#67449b;--purple-dark:#51347e;--paper:#faf8f5;--white:#fff;--line:#e2ddd9;--lavender:#ede7f4;--soft:#f4f0f8;--green:#3c6553;--radius:22px}
-    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}a{color:var(--purple);text-decoration-thickness:1px;text-underline-offset:4px}a:hover{color:var(--purple-dark)}a:focus-visible,summary:focus-visible{outline:3px solid var(--purple);outline-offset:5px}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.13}button,a,summary{-webkit-tap-highlight-color:transparent}.wrap{width:min(1120px,calc(100% - 64px));margin:auto}.skip{position:absolute;top:-80px;left:16px;background:var(--white);padding:12px 20px;z-index:10}.skip:focus{top:12px}.header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 0;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none}.mark{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:var(--purple);color:var(--white);font-size:24px;font-weight:750;letter-spacing:-3px;padding-right:3px}.brand-title{display:block;font-size:19px;font-weight:730;line-height:1.3}.brand-sub{display:block;font-size:10px;letter-spacing:1.9px;text-transform:uppercase;color:var(--muted)}.nav{display:flex;align-items:center;gap:25px;font-size:14px}.nav a{color:var(--muted);text-decoration:none}.nav a:hover{text-decoration:underline;color:var(--purple)}.eyebrow{display:block;font-size:12px;letter-spacing:1.5px;line-height:1.6;text-transform:uppercase;font-weight:740;color:var(--purple)}.hero{padding:75px 0 76px;display:grid;grid-template-columns:1.26fr .8fr;align-items:center;gap:70px}.hero h1{font-size:clamp(42px,4.8vw,66px);font-weight:650;letter-spacing:-2.7px;line-height:1.06;margin:22px 0 24px;max-width:680px}.hero h1 em{font-style:normal;color:var(--purple)}.lead{font-size:19px;color:var(--muted);max-width:585px;line-height:1.65}.actions{display:flex;flex-wrap:wrap;align-items:center;gap:13px;margin:30px 0 16px}.btn{display:inline-flex;justify-content:center;align-items:center;gap:12px;min-height:54px;padding:13px 24px;border:1px solid var(--purple);border-radius:12px;background:var(--purple);color:var(--white);font-size:16px;font-weight:680;text-decoration:none;line-height:1.35;text-align:center;transition:background .16s ease,transform .16s ease}.btn:hover{background:var(--purple-dark);border-color:var(--purple-dark);color:var(--white);transform:translateY(-1px)}.btn.secondary{background:transparent;color:var(--ink);border-color:#c9c1d0}.btn.secondary:hover{background:var(--soft);border-color:var(--purple)}.fine{font-size:13px;line-height:1.6;color:var(--muted)}.hero-note{max-width:480px}.hero-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 20px 45px -35px #46355566;overflow:hidden;transform:rotate(1deg)}.card-top{padding:20px 25px;border-bottom:1px solid var(--line);display:flex;gap:12px;justify-content:space-between;align-items:center;font-size:11px;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted)}.tag{display:inline-block;background:var(--soft);color:var(--purple);padding:4px 9px;border-radius:5px;white-space:nowrap;font-size:10px;letter-spacing:.8px;font-weight:650}.card-body{padding:29px 28px 31px}.card-body h2{font-family:Georgia,"Times New Roman",serif;font-size:31px;line-height:1.22;font-weight:400;letter-spacing:-.6px;margin-bottom:21px}.card-line{padding:15px 0;border-top:1px solid var(--line)}.card-line:last-child{padding-bottom:0}.card-line strong{font-size:14px;font-weight:650;display:block;margin-bottom:4px}.card-line p{font-size:14px;line-height:1.65;color:var(--muted)}.number{color:var(--purple);font-size:11px;margin-right:10px}.quick-facts{display:grid;grid-template-columns:repeat(3,1fr);padding:23px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);gap:25px}.fact{display:flex;align-items:baseline;gap:11px}.fact strong{font-size:23px;letter-spacing:-.5px;white-space:nowrap}.fact span{font-size:13px;line-height:1.5;color:var(--muted)}section.section{padding:84px 0}.section-head{display:grid;grid-template-columns:1fr .85fr;gap:90px;align-items:end;margin-bottom:34px}.section-head h2,.section-title{font-size:clamp(30px,3.4vw,43px);font-weight:630;letter-spacing:-1.35px;margin-top:12px}.section-head p{color:var(--muted);font-size:16px}.fit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:25px}.fit{padding:24px 0 0;border-top:2px solid #cfc2df}.fit h3{font-size:19px;font-weight:650;line-height:1.4;margin-bottom:10px}.fit p{font-size:15px;color:var(--muted)}.example-section{background:var(--soft);border-block:1px solid #e5deed}.example-intro{max-width:750px;margin:0 0 30px}.example-intro p{color:var(--muted);margin-top:15px}.example{display:grid;grid-template-columns:.74fr 1.26fr;gap:0;background:var(--white);border:1px solid #ddd3e6;border-radius:var(--radius);overflow:hidden}.example-context{padding:35px;background:#f9f6fc;border-right:1px solid #e4ddea}.example-context h3{font-size:24px;line-height:1.3;letter-spacing:-.5px;margin:17px 0}.example-context p{font-size:16px;color:#514959}.fiction{display:inline-block;color:var(--purple);background:#eae0f4;font-size:11px;font-weight:680;padding:5px 9px;border-radius:5px;line-height:1.4}.example-context .context-note{font-size:12px;margin-top:23px;padding-top:19px;border-top:1px solid #e0d7e9;line-height:1.6}.example-response{padding:32px 37px}.response-block{padding:20px 0;border-bottom:1px solid var(--line)}.response-block:first-child{padding-top:0}.response-block:last-child{padding-bottom:0;border:0}.response-block h4{font-size:13px;font-weight:720;letter-spacing:.25px;color:var(--purple);margin:0 0 9px}.response-block p{font-size:15px;line-height:1.8}.response-block .main-step{font-size:18px;font-weight:590;line-height:1.6;margin-bottom:10px}.example-caption{font-size:12px;color:var(--muted);max-width:810px;line-height:1.65;margin-top:16px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}.step{border-top:1px solid var(--line);padding-top:20px}.step-no{display:block;font-family:Georgia,"Times New Roman",serif;color:#aa96c5;font-size:39px;line-height:1;margin-bottom:18px}.step h3{font-size:20px;font-weight:650;line-height:1.35;margin-bottom:12px}.step p{font-size:15px;color:var(--muted)}.offer{display:grid;grid-template-columns:1.15fr .85fr;gap:65px;align-items:center;border-radius:var(--radius);padding:43px 48px;background:var(--ink);color:var(--white);margin-top:45px}.offer .eyebrow{color:#ceb6ed}.offer h3{font-size:29px;letter-spacing:-.6px;font-weight:620;line-height:1.25;margin-top:13px}.offer-list{padding-left:20px;font-size:15px;line-height:1.65;color:#e3dce9;margin:21px 0 0}.offer-list li+li{margin-top:9px}.price-panel{border-left:1px solid #51495c;padding-left:43px}.price{font-size:65px;line-height:1.1;font-weight:650;letter-spacing:-2px;margin:8px 0 15px}.price small{font-size:31px;font-weight:450}.price-label{font-size:13px;color:#cdc3d8}.price-panel .btn{width:100%;background:#e5d8f6;color:#352348;border-color:#e5d8f6;margin-top:23px}.price-panel .btn:hover{background:var(--white);border-color:var(--white)}.price-panel .fine{color:#cdc3d8;margin-top:13px}.trust{display:grid;grid-template-columns:1.05fr .95fr;gap:70px;padding:72px 0;border-top:1px solid var(--line)}.trust h2{font-size:33px;letter-spacing:-1px;font-weight:630;margin:12px 0 21px}.trust p{color:var(--muted);font-size:15px}.trust p+p{margin-top:16px}.boundaries{padding:25px 28px;border:1px solid var(--line);border-radius:16px;background:#f5f1ed;align-self:start}.boundaries h3{font-size:19px;line-height:1.4;font-weight:660;margin-bottom:12px}.boundaries p{font-size:14px}.faq{padding:0 0 76px}.faq .section-title{margin-bottom:25px}.faq details{border-bottom:1px solid var(--line);padding:20px 0}.faq summary{list-style:none;cursor:pointer;font-size:17px;font-weight:620;position:relative;padding-right:35px}.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";position:absolute;right:5px;top:0;font-size:23px;color:var(--purple);font-weight:400}.faq details[open] summary:after{content:"−"}.faq details p{color:var(--muted);max-width:800px;font-size:15px;margin-top:14px}.join-section{background:#eae2f2;border-top:1px solid #dbcee7;border-bottom:1px solid #dbcee7}.join{display:grid;grid-template-columns:1fr .85fr;gap:75px;padding:62px 0}.join h2{font-size:40px;letter-spacing:-1.3px;font-weight:630;margin:13px 0 21px}.join p{font-size:16px;color:#5c5267}.join .join-caption{font-size:13px;max-width:500px;margin-top:20px}.join-action{background:#faf7fd;border:1px solid #d6c8e2;border-radius:18px;padding:28px;align-self:center}.join-action .btn{display:flex;width:100%}.join-action .email-fallback{margin:18px 0 0;font-size:12px;color:var(--muted)}.email-address{display:inline-block;font-size:15px;font-weight:600;overflow-wrap:anywhere;margin-top:3px}.join-action .fine{font-size:12px;margin-top:15px;color:var(--muted)}.contact-process{grid-column:1/-1;border-top:1px solid #d7cce0;padding-top:24px;margin-top:-39px}.contact-process h3{font-size:15px;font-weight:650;margin-bottom:8px}.contact-process p{font-size:13px;max-width:860px;color:#60556b}.footer{padding:35px 0 37px;display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.footer p{font-size:12px;color:var(--muted);line-height:1.7}.footer strong{font-size:13px;color:var(--ink);font-weight:620}.footer-links{justify-self:end;display:flex;align-items:flex-start;gap:22px;font-size:13px}.footer-note{grid-column:1/-1;color:var(--muted);font-size:11px;margin-top:7px}.only-mobile{display:none}
-    @media(max-width:960px){.hero{gap:32px;grid-template-columns:1.1fr .8fr}.hero h1{letter-spacing:-1.8px}.hero-card{transform:none}.card-body{padding:24px}.card-top{padding:17px 23px}.card-body h2{font-size:27px}.section-head{gap:40px}.offer{padding:37px;gap:35px}.price-panel{padding-left:30px}.trust{gap:40px}.join{gap:40px}.contact-process{margin-top:-12px}}
-    @media(max-width:720px){body{font-size:16px}.wrap{width:calc(100% - 40px)}.header{padding:19px 0;gap:12px}.mark{width:39px;height:39px;border-radius:12px;font-size:23px}.brand-title{font-size:17px}.brand-sub{font-size:8px;letter-spacing:1.65px}.nav{gap:0;font-size:12px}.nav .nav-format,.nav .nav-example{display:none}.hero{display:block;padding:43px 0 38px}.eyebrow{font-size:10px;letter-spacing:1.2px}.hero h1{font-size:clamp(39px,9.5vw,56px);letter-spacing:-1.8px;line-height:1.08;margin:18px 0 23px}.lead{font-size:17px;line-height:1.7}.actions{gap:10px;margin-top:26px}.actions .btn{flex:1 1 100%}.btn{min-height:54px;font-size:16px}.fine{font-size:12px}.hero-card{margin-top:36px;max-width:470px}.card-body h2{font-size:29px}.card-body{padding:25px}.card-line p{font-size:14px}.quick-facts{gap:15px;padding:20px 0}.fact{display:block}.fact strong{display:block;font-size:21px;margin-bottom:3px}.fact span{display:block;font-size:11px;line-height:1.6}.section-head{display:block;margin-bottom:28px}.section-head h2,.section-title{font-size:31px;letter-spacing:-.8px;line-height:1.18}.section-head p{margin-top:18px;font-size:15px}section.section{padding:51px 0}.fit-grid{grid-template-columns:1fr;gap:23px}.fit{padding-top:17px}.fit h3{font-size:18px;margin-bottom:6px}.fit p{font-size:15px}.example-intro{margin-bottom:25px}.example-intro p{font-size:15px}.example{display:block;border-radius:17px}.example-context{padding:24px;border-right:0;border-bottom:1px solid #e4ddea}.example-context h3{font-size:23px;margin:16px 0 13px}.example-context p{font-size:15px}.example-context .context-note{margin-top:18px;padding-top:16px}.example-response{padding:26px 24px}.response-block p{font-size:15px}.response-block .main-step{font-size:18px}.steps{grid-template-columns:1fr;gap:26px}.step{display:grid;grid-template-columns:36px 1fr;column-gap:18px;padding-top:19px}.step-no{grid-row:1/3;font-size:30px;line-height:1.15;margin:0}.step h3{font-size:18px;margin-bottom:8px}.step p{grid-column:2}.offer{display:block;padding:28px 24px;margin-top:31px;border-radius:17px}.offer h3{font-size:26px}.offer-list{font-size:14px}.price-panel{border-left:0;border-top:1px solid #51495c;padding:25px 0 0;margin-top:28px}.price{font-size:59px}.price-panel .btn{margin-top:19px}.trust{display:block;padding:50px 0}.trust h2{font-size:31px}.boundaries{margin-top:27px;padding:22px}.faq{padding-bottom:49px}.faq .section-title{font-size:29px}.faq summary{font-size:16px;line-height:1.6}.faq details{padding:18px 0}.join{display:block;padding:46px 0}.join h2{font-size:33px;letter-spacing:-1px;line-height:1.15}.join p{font-size:15px}.join-action{margin-top:27px;padding:23px}.join-action .btn{font-size:15px}.email-address{font-size:15px}.contact-process{padding-top:24px;margin-top:28px}.contact-process p{font-size:13px}.footer{display:block;padding:28px 0 32px}.footer-links{display:flex;flex-wrap:wrap;gap:12px 22px;margin-top:22px}.footer-note{margin-top:20px}}
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}.btn:hover{transform:none}}
-    @media print{body{background:#fff}.nav,.actions,.join-action{display:none}.wrap{width:100%}.hero{padding:25px 0}.hero-card{box-shadow:none}.hero h1{font-size:42px}.offer{background:#fff;color:var(--ink);border:1px solid var(--line)}.offer-list,.price-label,.price-panel .fine,.offer .eyebrow{color:var(--muted)}section.section{padding:30px 0}.example{break-inside:avoid}.footer{padding-bottom:0}}
-  </style>
-</head>
-<body>
-  <a class="skip" href="#main">Перейти к содержанию</a>
-  <div class="wrap">
-    <header class="header">
-      <a class="brand" href="#main" aria-label="После ссоры — к началу страницы"><span class="mark" aria-hidden="true">rr</span><span><span class="brand-title">После ссоры</span><span class="brand-sub">Relationship Reset</span></span></a>
-      <nav class="nav" aria-label="Навигация"><a class="nav-example" href="#example">Пример разбора</a><a class="nav-format" href="#format">Формат и цена</a><a href="https://t.me/relationship_reset">Наш Telegram ↗</a></nav>
-    </header>
-  </div>
-  <main id="main">
-    <div class="wrap">
-      <section class="hero" aria-labelledby="hero-title">
-        <div>
-          <span class="eyebrow">Письменный разбор · можно начать одному</span>
-          <h1 id="hero-title">После ссоры хочется понять, <em>что делать дальше.</em></h1>
-          <p class="lead">Разберём конкретную ситуацию и поможем выбрать один спокойный следующий шаг. С учётом того, что вы уже пробовали и о чём попросил партнёр.</p>
-          <div class="actions"><a class="btn" href="#join">Записаться в пилот <span aria-hidden="true">↗</span></a><a class="btn secondary" href="#example">Посмотреть пример</a></div>
-          <p class="fine hero-note">Готовим пилот для первых трёх покупателей: 990 ₽ за весь объём. Сейчас собираем интерес — оплату пока не принимаем.</p>
-        </div>
-        <aside class="hero-card" aria-label="Что входит в письменный разбор">
-          <div class="card-top"><span>Ваш следующий шаг</span><span class="tag">Формат ответа</span></div>
-          <div class="card-body">
-            <h2>Сначала разобраться.<br>Потом действовать.</h2>
-            <div class="card-line"><strong><span class="number">01</span>Что произошло</strong><p>Отделим описанные факты от догадок о чувствах и намерениях партнёра.</p></div>
-            <div class="card-line"><strong><span class="number">02</span>Что можно сделать</strong><p>Предложим один шаг, который зависит от вас и учитывает границы общения.</p></div>
-            <div class="card-line"><strong><span class="number">03</span>Что учесть дальше</strong><p>Обозначим, чего избегать и что сообщить для следующей корректировки.</p></div>
-          </div>
-        </aside>
-      </section>
-      <div class="quick-facts" aria-label="Параметры пилота"><div class="fact"><strong>990 ₽</strong><span>разово,<br>без подписки</span></div><div class="fact"><strong>7 дней</strong><span>с выдачи<br>первого разбора</span></div><div class="fact"><strong>До 2</strong><span>корректировок<br>после разбора</span></div></div>
-      <section class="section" aria-labelledby="fit-title">
-        <div class="section-head"><div><span class="eyebrow">Для одной конкретной ситуации</span><h2 id="fit-title">Когда мысли ходят<br>по кругу.</h2></div><p>Не нужно сразу решать судьбу отношений. Можно начать с того, что случилось, и разобраться с ближайшим действием.</p></div>
-        <div class="fit-grid"><article class="fit"><h3>Сказали лишнее</h3><p>Хотите признать свою часть ответственности, не превращая извинение в новый спор.</p></article><article class="fit"><h3>Не знаете, писать ли ещё</h3><p>Тянет объясниться, но важно учесть просьбу о паузе и уже сделанные попытки контакта.</p></article><article class="fit"><h3>Повторяется один спор</h3><p>Нужен взгляд на последовательность ваших действий и одну договорённость, которую можно обсудить.</p></article></div>
-      </section>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Письменный разбор одной ссоры: понятный следующий шаг и до двух корректировок за 7 дней. Планируемый пилот — 990 ₽. Посмотрите вымышленный пример и узнайте условия.">
+<meta name="theme-color" content="#f8f9f6">
+<meta name="robots" content="noindex,follow">
+<title>После ссоры — разобраться и выбрать следующий шаг</title>
+<style>:root{color-scheme:light;--paper:#f8f9f6;--white:#fff;--ink:#192e34;--muted:#54656a;--green:#245c50;--green-dark:#19483e;--soft:#e7eeea;--line:#d7dfda;--accent:#c76042;--radius:18px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body.pilot{margin:0;background:var(--paper);color:var(--ink);font:17px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.pilot a{color:inherit;text-underline-offset:4px}
+.pilot a:hover{text-decoration-thickness:2px}
+.pilot a:focus-visible,.pilot summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px;border-radius:3px}
+.pilot p,.pilot h1,.pilot h2,.pilot h3,.pilot h4,.pilot blockquote{margin:0}
+.pilot h1,.pilot h2,.pilot h3,.pilot h4{font-weight:600;line-height:1.17;letter-spacing:-.035em}
+.pilot h2{font-size:clamp(2rem,3.4vw,3rem)}
+.pilot h3{font-size:1.25rem;letter-spacing:-.015em}
+.pilot p{overflow-wrap:break-word}
+.pilot .shell{width:min(1160px,calc(100% - 64px));margin-inline:auto}
+.pilot .skip-link{position:absolute;left:20px;top:-100px;z-index:10;background:var(--white);padding:14px 20px}
+.pilot .skip-link:focus{top:12px}
+.pilot .opening-note{padding:9px 20px;text-align:center;background:var(--ink);color:#fff;font-size:.875rem;line-height:1.5}
+.pilot .site-header{display:flex;align-items:center;justify-content:space-between;gap:28px;min-height:106px;border-bottom:1px solid var(--line)}
+.pilot .wordmark{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-size:1.45rem;font-weight:650;line-height:1.1;letter-spacing:-.05em}
+.pilot .brand-icon{display:flex;align-items:center;justify-content:center;min-width:42px;width:42px;height:42px;border-radius:50%;background:var(--green);color:#fff;font-family:Georgia,serif;font-size:1.3rem;letter-spacing:-.1em;padding-right:3px;font-style:italic}
+.pilot .brand-caption{display:block;margin-top:7px;font-size:.63rem;letter-spacing:.14em;font-weight:500;color:var(--muted)}
+.pilot .site-nav{display:flex;gap:28px;align-items:center;font-size:.875rem}
+.pilot .site-nav a{text-decoration:none;padding-block:12px}
+.pilot .site-nav a:hover{color:var(--green);text-decoration:underline}
+.pilot .header-cta{border:1px solid var(--green);border-radius:7px;padding:10px 18px;font-size:.875rem;font-weight:600;text-decoration:none;white-space:nowrap}
+.pilot .header-cta:hover{background:var(--soft)}
+.pilot .hero-section{min-width:0;display:grid;grid-template-columns:1.1fr 1fr;gap:54px;align-items:center;padding-block:64px 68px}
+.pilot .eyebrow{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;font-weight:650;color:var(--green);line-height:1.5}
+.pilot .hero-copy h1{overflow-wrap:break-word;font-size:clamp(2.7rem,4.7vw,4.3rem);line-height:1.07;letter-spacing:-.058em;margin-top:22px}
+.pilot .hero-copy h1 em{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.055em;color:var(--green)}
+.pilot .hero-intro{font-size:1.08rem;line-height:1.7;color:var(--muted);margin-top:26px!important;max-width:34rem}
+.pilot .hero-price{display:flex;align-items:center;gap:18px;margin-top:28px!important}
+.pilot .hero-price strong{font-size:2.15rem;font-weight:600;letter-spacing:-.045em;white-space:nowrap}
+.pilot .hero-price span{font-size:.85rem;line-height:1.5;color:var(--muted);border-left:1px solid var(--line);padding-left:18px}
+.pilot .hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:22px;margin-block:25px 14px}
+.pilot .button{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:14px 23px;border-radius:7px;font-size:.95rem;font-weight:600;line-height:1.4;text-decoration:none;text-align:center;transition:background-color .15s ease}
+.pilot .button-primary{background:var(--green);color:#fff}
+.pilot .button-primary:hover{background:var(--green-dark);text-decoration:none}
+.pilot .text-link{font-size:.92rem;font-weight:550;padding-block:12px}
+.pilot .quiet{font-size:.82rem;line-height:1.6;color:var(--muted)}
+.pilot .hero-copy,.pilot .sample-stage{min-width:0}
+.pilot .sample-stage{background:#e6eee9;border-radius:18px;padding:25px 27px 18px;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+.pilot .sample-topline{display:flex;justify-content:space-between;gap:12px;font-size:.75rem;color:var(--green);margin-bottom:19px}
+.pilot .sample-paper{background:var(--white);padding:27px 29px 20px;box-shadow:0 12px 32px #192e3410;border:1px solid #dce4de;border-radius:4px}
+.pilot .document-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;display:flex;justify-content:space-between;gap:15px;color:var(--muted)}
+.pilot .document-label span{font-size:.75rem;letter-spacing:0;text-transform:none;font-weight:400}
+.pilot .sample-story{font:italic 1.65rem/1.4 Georgia,"Times New Roman",serif;letter-spacing:-.025em;margin-top:26px}
+.pilot .sample-rule{height:1px;background:var(--line);margin-block:23px}
+.pilot .small-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;font-weight:650;color:var(--green)}
+.pilot .sample-paper p:not([class]){font-size:.875rem;line-height:1.7;margin-top:8px}
+.pilot .sample-action{background:#f0f4f0;border-left:3px solid var(--green);padding:16px 17px;margin-top:23px}
+.pilot .sample-action h2{font-size:1.25rem;margin-top:9px;letter-spacing:-.02em}
+.pilot .document-footer{display:flex;justify-content:space-between;gap:10px;padding-top:19px;margin-top:20px;border-top:1px solid var(--line);font-size:.75rem;color:var(--muted)}
+.pilot .sample-caption{font-size:.75rem;color:var(--muted);text-align:center;margin-top:14px}
+.pilot .benefit-line{display:grid;grid-template-columns:repeat(3,1fr);padding-block:24px;border-block:1px solid var(--line);gap:28px}
+.pilot .benefit-line p{padding-left:22px;border-left:2px solid var(--line)}
+.pilot .benefit-line strong{font-size:.96rem;display:block;font-weight:550}
+.pilot .benefit-line span{display:block;font-size:.8rem;color:var(--muted);margin-top:5px}
+.pilot .section{padding-block:90px}
+.pilot .section-heading .eyebrow{margin-bottom:16px}
+.pilot .split-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:50px}
+.pilot .split-heading p:not(.eyebrow){max-width:22rem;color:var(--muted);font-size:1rem}
+.pilot .situations{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;margin-top:42px}
+.pilot .item-number{font-size:.78rem;color:#a8462e;font-weight:600;letter-spacing:.04em}
+.pilot .situations h3{margin-block:14px 12px;font-size:1.18rem}
+.pilot .situations p{font-size:.96rem;color:var(--muted)}
+.pilot .fit-note{font-size:.85rem;color:var(--muted);padding-top:26px;margin-top:33px!important;border-top:1px solid var(--line)}
+.pilot .example-section{background:var(--soft)}
+.pilot .example-section .section-heading h2{font-size:clamp(1.9rem,3.2vw,2.7rem)}
+.pilot .full-example{display:grid;grid-template-columns:.7fr 1.3fr;gap:48px;margin-top:43px;align-items:start}
+.pilot .case-story{padding-top:23px}
+.pilot .case-story blockquote{font:italic 1.6rem/1.5 Georgia,"Times New Roman",serif;margin-block:20px 25px;letter-spacing:-.02em}
+.pilot .review-document{padding:30px 34px;background:#fff;border:1px solid #d5ddd6;border-radius:6px;box-shadow:0 12px 28px #192e3408}
+.pilot .review-heading{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.pilot .review-heading span{font-size:.75rem;color:var(--muted)}
+.pilot .review-row{display:flex;gap:18px;padding-block:22px;border-bottom:1px solid var(--line)}
+.pilot .review-row:last-child{border:0;padding-bottom:0}
+.pilot .review-index{font-size:.75rem;color:var(--muted);padding-top:3px}
+.pilot .review-row h4{font-size:1rem;line-height:1.4;letter-spacing:0}
+.pilot .review-row p{font-size:.9rem;line-height:1.75;margin-top:9px;color:var(--muted)}
+.pilot .highlighted h4{color:var(--green)}
+.pilot .process{list-style:none;padding:0;margin:42px 0 0;border-top:1px solid var(--line)}
+.pilot .process li{display:grid;grid-template-columns:50px 1fr 210px;gap:25px;padding:30px 0;border-bottom:1px solid var(--line)}
+.pilot .process h3{margin-bottom:10px}
+.pilot .process p{color:var(--muted);font-size:.97rem;max-width:39rem}
+.pilot .process-detail{text-align:right;font-size:.82rem;color:var(--green);font-weight:550;align-self:start;padding-top:3px}
+.pilot .timing-note{margin-top:20px!important;max-width:47rem}
+.pilot .human-section{background:var(--ink);color:#f4f7f4;padding-block:72px}
+.pilot .human-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:94px;align-items:center}
+.pilot .human-section .eyebrow,.pilot .human-section .small-label{color:#b0cbbd}
+.pilot .human-section h2{font-size:clamp(1.9rem,3vw,2.6rem);margin-block:18px 22px}
+.pilot .human-section p:not([class]){color:#d1dcd7;font-size:.95rem}
+.pilot .human-section .human-limits{color:#b0c3b9;font-size:.85rem;margin-top:22px}
+.pilot .responsibility{border-left:1px solid #526861;padding-left:38px}
+.pilot .responsibility h3{font-size:1.6rem;line-height:1.3;margin-block:15px;max-width:20rem}
+.pilot .human-section .contact-link{display:inline-block;font-size:.9rem;margin-block:20px 12px;overflow-wrap:anywhere}
+.pilot .human-section .quiet{color:#b0c3b9}
+.pilot .offer-layout{display:grid;grid-template-columns:1fr 1fr;gap:95px;align-items:center}
+.pilot .offer-copy h2{margin-block:18px 26px}
+.pilot .offer-copy p:not(.eyebrow){color:var(--muted)}
+.pilot .contact-instruction{font-size:.88rem;border-left:3px solid var(--line);padding-left:20px;margin-top:28px!important}
+.pilot .price-panel{padding:34px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius)}
+.pilot .offer-price{font-size:3.7rem;line-height:1.15;letter-spacing:-.06em;font-weight:550;margin-block:15px 24px}
+.pilot .offer-price span{display:block;font-size:.83rem;font-weight:400;line-height:1.6;color:var(--muted);letter-spacing:0;margin-top:8px}
+.pilot .included{list-style:none;margin:0;padding:0}
+.pilot .included li{position:relative;padding:9px 0 9px 26px;font-size:.96rem;border-bottom:1px solid #edf0ec}
+.pilot .included li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:600}
+.pilot .price-note{color:var(--muted);font-size:.83rem;line-height:1.65;margin-block:19px 24px!important}
+.pilot .price-panel .button{width:100%}
+.pilot .mailto-note{font-size:.77rem;color:var(--muted);text-align:center;margin-top:14px!important;line-height:1.6}
+.pilot .email-fallback{font-size:.8rem;text-align:center;border-top:1px solid var(--line);padding-top:20px;margin-top:20px!important;color:var(--muted)}
+.pilot .email-fallback a{color:var(--green);overflow-wrap:anywhere}
+.pilot .faq-layout{display:grid;grid-template-columns:.65fr 1.35fr;gap:65px;padding-top:15px}
+.pilot .question{border-top:1px solid var(--line)}
+.pilot .question:last-child{border-bottom:1px solid var(--line)}
+.pilot .question summary{cursor:pointer;padding:23px 34px 23px 0;font-size:1rem;font-weight:550;position:relative;list-style:none;line-height:1.5}
+.pilot .question summary::-webkit-details-marker{display:none}
+.pilot .question summary:after{content:"+";position:absolute;right:3px;top:19px;font-size:1.4rem;font-weight:350;color:var(--green)}
+.pilot .question[open] summary:after{content:"−"}
+.pilot .question p{font-size:.93rem;color:var(--muted);padding-bottom:24px;padding-right:24px;line-height:1.75}
+.pilot .safety-note{border:1px solid var(--line);border-radius:10px;padding:24px 30px;display:grid;grid-template-columns:220px 1fr;gap:22px;margin-bottom:64px}
+.pilot .safety-note h2{font-size:1rem;letter-spacing:0;line-height:1.5}
+.pilot .safety-note p{font-size:.84rem;color:var(--muted)}
+.pilot .site-footer{border-top:1px solid var(--line);padding-block:35px 28px}
+.pilot .footer-main{display:flex;justify-content:space-between;gap:30px;align-items:center}
+.pilot .footer-main div a{display:block;font-size:.82rem;line-height:1.7;overflow-wrap:anywhere}
+.pilot .footer-main div a+a{margin-top:6px}
+.pilot .footer-fine{display:flex;justify-content:space-between;gap:40px;margin-block:30px 18px;color:var(--muted);font-size:.77rem}
+.pilot .footer-privacy{font-size:.75rem;color:var(--muted);border-top:1px solid var(--line);padding-top:18px;max-width:65rem}
+body.legacy{--bg:#f8f9f6;--paper:#fff;--ink:#192e34;--muted:#54656a;--line:#d7dfda;--accent:#245c50;--accent-dark:#19483e;--soft:#e7eeea;background:#f8f9f6;color:#192e34;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.65}
+.legacy .btn,.legacy button{border-radius:7px;background:#245c50;color:#fff;min-height:48px}
+.legacy .btn.secondary,.legacy button.secondary{background:#fff;color:#245c50;border-color:#d7dfda}
+.legacy .brand-symbol{background:#245c50;border-radius:50%}
+.legacy .preview,.legacy .card,.legacy .step-card,.legacy .diag,.legacy .seller{box-shadow:none;border-radius:12px;border-color:#d7dfda}
+.legacy .hero h1 em{color:#245c50;font-family:Georgia,serif;font-weight:400}
+.legacy .hero h1{letter-spacing:-.05em;line-height:1.1}
+.legacy .eyebrow,.legacy .kicker{color:#245c50}
+.legacy .offer{background:#192e34;color:#fff;border-radius:14px}
+.legacy .offer .kicker,.legacy .offer .muted,.legacy .offer .tiny{color:#d1dcd7}
+.legacy .offer a{color:#fff}
+.legacy .offer .btn{background:#fff;color:#245c50}
+.legacy .preview-answer,.legacy .situation,.legacy .opt:has(input:checked){background:#e7eeea}
+.legacy a:focus-visible,.legacy button:focus-visible,.legacy summary:focus-visible,.legacy textarea:focus-visible,.legacy input:focus-visible{outline:3px solid #c76042;outline-offset:4px}
+.legacy .result .block{border-radius:8px}
+.legacy .footer a,.legacy .seller-links a{overflow-wrap:anywhere}
+.legacy textarea{font:inherit}
+@media(min-width:1500px){.pilot .hero-copy h1{font-size:4.3rem}}
+@media(max-width:1050px){.pilot .shell{width:calc(100% - 48px)}.pilot .site-nav{gap:18px}.pilot .hero-section{gap:30px;padding-block:48px}.pilot .hero-copy h1{font-size:3.3rem}.pilot .hero-actions{gap:12px}.pilot .sample-stage{padding:18px}.pilot .sample-paper{padding:22px}.pilot .document-label{display:block}.pilot .document-label span{display:block;margin-top:5px}.pilot .sample-topline{font-size:.75rem}.pilot .offer-layout,.pilot .human-layout{gap:48px}.pilot .full-example{gap:32px}.pilot .split-heading{gap:30px}.pilot .split-heading p:not(.eyebrow){max-width:18rem}.pilot .section{padding-block:70px}.pilot .faq-layout{padding-top:10px}}
+@media(max-width:800px){.pilot .site-header{min-height:88px}.pilot .site-nav{display:none}.pilot .hero-section{grid-template-columns:1fr;gap:32px;padding-block:38px}.pilot .hero-copy{max-width:38rem}.pilot .hero-copy h1{font-size:clamp(2.75rem,7.5vw,3.7rem)}.pilot .hero-intro{max-width:36rem}.pilot .sample-stage{max-width:36rem;width:100%;padding:22px 26px}.pilot .sample-paper{padding:26px}.pilot .document-label{display:flex}.pilot .document-label span{margin:0}.pilot .sample-story br{display:none}.pilot .sample-story{max-width:24rem}.pilot .sample-topline{font-size:.75rem}.pilot .benefit-line{gap:16px}.pilot .benefit-line p{padding-left:14px}.pilot .benefit-line strong{font-size:.86rem}.pilot .benefit-line span{font-size:.75rem}.pilot .split-heading{display:block}.pilot .split-heading p:not(.eyebrow){max-width:34rem;margin-top:20px}.pilot .situations{gap:25px}.pilot .full-example{grid-template-columns:1fr;gap:24px}.pilot .case-story{padding:0;max-width:36rem}.pilot .case-story blockquote{margin-bottom:15px}.pilot .process li{grid-template-columns:32px 1fr;gap:16px}.pilot .process-detail{grid-column:2;text-align:left;padding:0}.pilot .human-layout{grid-template-columns:1fr;gap:34px}.pilot .human-section{padding-block:54px}.pilot .responsibility{padding-left:25px;max-width:32rem}.pilot .offer-layout{grid-template-columns:1fr;gap:30px}.pilot .offer-copy{max-width:36rem}.pilot .price-panel{max-width:36rem;width:100%}.pilot .faq-layout{grid-template-columns:1fr;gap:28px}.pilot .safety-note{grid-template-columns:1fr;gap:10px}.pilot .footer-fine{display:block}.pilot .footer-fine p+p{margin-top:15px}}
+@media(max-width:520px){.pilot .shell{width:calc(100% - 36px)}.pilot .opening-note{font-size:.75rem;padding:9px 18px}.pilot .site-header{gap:12px;min-height:82px}.pilot .wordmark{gap:9px;font-size:1.18rem}.pilot .brand-icon{width:34px;height:34px;min-width:34px;font-size:1.12rem}.pilot .brand-caption{font-size:.53rem;letter-spacing:.1em}.pilot .header-cta{padding:10px 12px;font-size:.76rem;white-space:normal;max-width:105px;line-height:1.35;text-align:center}.pilot .hero-section{padding-block:30px 32px}.pilot .hero-copy h1{font-size:clamp(2.55rem,10.4vw,3.3rem);margin-top:17px}.pilot .eyebrow{font-size:.75rem;letter-spacing:.065em}.pilot .hero-intro{font-size:1rem;margin-top:21px!important}.pilot .hero-price{gap:14px;margin-top:22px!important}.pilot .hero-price strong{font-size:2rem}.pilot .hero-price span{font-size:.75rem;padding-left:14px}.pilot .hero-actions{gap:7px;display:grid;grid-template-columns:1fr;margin-block:22px 9px}.pilot .text-link{text-align:center;min-height:44px}.pilot .hero-copy .quiet{font-size:.76rem}.pilot .sample-stage{padding:18px 14px 13px}.pilot .sample-topline{font-size:.75rem;margin-bottom:14px}.pilot .sample-paper{padding:21px}.pilot .document-label{font-size:.75rem;display:block}.pilot .document-label span{font-size:.75rem;display:block;margin-top:5px}.pilot .sample-story{font-size:1.55rem;margin-top:22px}.pilot .sample-action{padding:14px;margin-top:19px}.pilot .sample-action h2{font-size:1.12rem}.pilot .sample-paper p:not([class]){font-size:.84rem}.pilot .sample-rule{margin-block:19px}.pilot .sample-caption{font-size:.75rem}.pilot .benefit-line{grid-template-columns:1fr;gap:16px;padding-block:22px}.pilot .benefit-line p{padding-left:16px}.pilot .benefit-line strong{font-size:.91rem}.pilot .benefit-line span{font-size:.8rem;margin-top:1px}.pilot .section{padding-block:54px}.pilot h2{font-size:2rem}.pilot .situations{grid-template-columns:1fr;gap:23px;margin-top:30px}.pilot .situations article{border-top:1px solid var(--line);padding-top:19px}.pilot .situations h3{margin-block:7px 8px}.pilot .fit-note{margin-top:25px!important;font-size:.8rem}.pilot .example-section .section-heading h2{font-size:1.85rem}.pilot .full-example{margin-top:27px}.pilot .case-story blockquote{font-size:1.45rem}.pilot .review-document{padding:22px 19px}.pilot .review-row{gap:12px;padding-block:20px}.pilot .review-row p{font-size:.89rem}.pilot .process{margin-top:30px}.pilot .process li{padding-block:25px}.pilot .process h3{font-size:1.17rem}.pilot .process p{font-size:.94rem}.pilot .human-section h2{font-size:1.9rem}.pilot .responsibility{padding-left:20px}.pilot .responsibility h3{font-size:1.4rem}.pilot .offer-copy h2{margin-block:17px 23px}.pilot .price-panel{padding:27px 22px;border-radius:12px}.pilot .offer-price{font-size:3.5rem}.pilot .included li{font-size:.9rem}.pilot .faq-layout{padding-top:0}.pilot .question summary{font-size:.95rem}.pilot .question p{font-size:.9rem;padding-right:0}.pilot .safety-note{padding:21px;margin-bottom:44px}.pilot .safety-note h2{font-size:1rem}.pilot .safety-note p{font-size:.81rem}.pilot .footer-main{display:block}.pilot .footer-main div{margin-top:23px}.pilot .footer-fine{margin-top:24px}.legacy .hero h1{font-size:2.7rem}.legacy .wrap{padding-inline:18px}.legacy .hero-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pilot .button{transition:none}}
+@media print{.pilot .opening-note,.pilot .site-nav,.pilot .header-cta,.pilot .skip-link{display:none}.pilot{background:#fff}.pilot .hero-section,.pilot .human-layout,.pilot .offer-layout,.pilot .full-example,.pilot .faq-layout{display:block}.pilot .section{padding-block:24px}.pilot .sample-stage{break-inside:avoid}.pilot .human-section{background:#fff;color:#192e34}.pilot .human-section p,.pilot .human-section .quiet,.pilot .human-section .eyebrow,.pilot .human-section .small-label{color:#192e34}.pilot .question p{display:block}}
+</style></head>
+<body class="pilot" id="top">
+<a class="skip-link" href="#main">Перейти к содержанию</a>
+<div class="opening-note">Готовим первый пилот. Сейчас можно узнать о старте — без оплаты.</div>
+<header class="site-header shell">
+  <a class="wordmark" href="#top" aria-label="После ссоры — в начало"><span class="brand-icon" aria-hidden="true">пс</span><span>после ссоры<span class="brand-caption">RELATIONSHIP RESET</span></span></a>
+  <nav class="site-nav" aria-label="Навигация по странице">
+    <a href="#example" class="">Пример разбора</a><a href="#format" class="">Что входит</a><a href="#questions" class="">Вопросы</a>
+  </nav>
+  <a href="#join" class="header-cta">Узнать о пилоте</a>
+</header>
+<main id="main">
+  <section class="hero-section shell" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow">Письменный разбор одной ссоры · 18+</p>
+      <h1 id="hero-title">Ссора уже случилась.<br><em>Что делать теперь?</em></h1>
+      <p class="hero-intro">Поможем отделить факты от догадок и выбрать один спокойный следующий шаг. С учётом того, что вы уже пробовали и о чём попросил партнёр.</p>
+      <p class="hero-price"><strong>990 ₽</strong><span>первый разбор + до 2 корректировок<br>в течение 7 дней с первого ответа</span></p>
+      <div class="hero-actions"><a href="#join" class="button button-primary">Узнать условия пилота</a><a href="#example" class="text-link">Посмотреть пример</a></div>
+      <p class="quiet">Цена для первых трёх покупателей. Сейчас — только интерес к запуску.</p>
     </div>
-    <section class="section example-section" id="example" aria-labelledby="example-title">
-      <div class="wrap">
-        <div class="example-intro"><span class="eyebrow">Посмотрите до того, как решиться</span><h2 class="section-title" id="example-title">Как выглядит разбор.</h2><p>Не универсальное сообщение для примирения, а ответ на описанную ситуацию. Иногда следующий шаг — выдержать просьбу о паузе.</p></div>
-        <article class="example">
-          <div class="example-context"><span class="fiction">Вымышленная ситуация</span><h3>«Хочется написать<br>ещё раз»</h3><p>После ссоры партнёр попросил побыть отдельно и пока не писать. Вы уже отправили два сообщения с объяснениями, ответа нет. Хочется послать ещё одно, чтобы уточнить, когда можно вернуться к разговору. Срок паузы вы не согласовали.</p><p class="context-note">Условия примера: оба участника совершеннолетние; нет угроз, насилия или страха за безопасность. При других обстоятельствах этот пример не подходит.</p></div>
-          <div class="example-response">
-            <div class="response-block"><h4>Что известно — и чего мы не знаем</h4><p>Есть прямая просьба не писать и две попытки контакта после неё. Отсутствие ответа не позволяет понять, что партнёр чувствует или какое решение принимает. Оно также не отменяет озвученную границу. Назначать от его имени момент окончания паузы нельзя.</p></div>
-            <div class="response-block"><h4>Один следующий шаг</h4><p class="main-step">Сейчас прекратите новые попытки контакта.</p><p>В личной заметке, которую не будете отправлять, разделите три вещи: что произошло, за какое своё действие вы отвечаете и что хотели бы изменить в дальнейшем. Достаточно одного конкретного пункта в каждой строке.</p><p style="margin-top:12px">К обсуждению можно вернуться, если партнёр сам явно обозначит готовность; само по себе ожидание несколько дней такого разрешения не даёт.</p></div>
-            <div class="response-block"><h4>Чего избегать</h4><p>Не передавайте сообщения через друзей, не используйте другой аккаунт и не устраивайте «случайную» встречу.</p></div>
-            <div class="response-block"><h4>Для следующей корректировки</h4><p>Что помогло выдержать просьбу о паузе и появилась ли новая, явно выраженная договорённость о контакте?</p></div>
-          </div>
-        </article>
-        <p class="example-caption">Это демонстрация формата, а не отзыв, реальный заказ или обещание результата. Для вашей ситуации содержание разбора может быть другим.</p>
-      </div>
-    </section>
-    <div class="wrap">
-      <section class="section" id="format" aria-labelledby="format-title">
-        <div class="section-head"><div><span class="eyebrow">Формат пилота</span><h2 id="format-title">Один разбор.<br>Возможность уточнить.</h2></div><p>Письменно, без обязательного созвона и участия партнёра. Заранее понятно, что входит в услугу и когда ждать ответ.</p></div>
-        <div class="steps"><article class="step"><span class="step-no" aria-hidden="true">01</span><h3>Согласуем запрос</h3><p>До оплаты уточним, подходит ли формат, пришлём условия и согласуем закрытый способ передачи анкеты и получения ответа.</p></article><article class="step"><span class="step-no" aria-hidden="true">02</span><h3>Подготовим разбор</h3><p>Первый письменный ответ — в течение 24 часов после получения анкеты и подтверждённой оплаты. Человек проверяет и редактирует весь черновик ИИ.</p></article><article class="step"><span class="step-no" aria-hidden="true">03</span><h3>Учтём, что изменилось</h3><p>В течение семи дней с первого разбора можно прислать до двух запросов на корректировку. На каждый ответим в течение 24 часов.</p></article></div>
-        <div class="offer"><div><span class="eyebrow">Условия для первых трёх покупателей</span><h3>Всё в одном<br>письменном формате.</h3><ul class="offer-list"><li>Первый разбор вашей конкретной ситуации</li><li>До двух корректировок по новым обстоятельствам</li><li>Проверка человеком перед каждой выдачей</li><li>Семь дней с момента первого разбора</li></ul></div><div class="price-panel"><p class="price-label">За весь объём</p><p class="price">990 <small>₽</small></p><p class="price-label">Разовая оплата. Без подписки<br>и автоматического продления.</p><a class="btn" href="#join">Записаться в пилот <span aria-hidden="true">↗</span></a><p class="fine">Сейчас — только запись об интересе.<br>Это не платный заказ и не бронирование.</p></div></div>
-      </section>
-      <section class="trust" aria-labelledby="trust-title"><div><span class="eyebrow">Кто готовит ответ</span><h2 id="trust-title">ИИ помогает с черновиком.<br>Человек проверяет весь ответ.</h2><p>Черновик не отправляется клиенту автоматически. Перед выдачей человек проверяет соответствие вашей анкете, учитывает уже сделанные попытки и границы общения, редактирует формулировки.</p><p>Мы не угадываем скрытые мотивы партнёра и не обещаем примирение. Вы получаете письменный разбор и возможность уточнить его по тому, что произошло дальше.</p></div><aside class="boundaries"><h3>Границы формата</h3><p>Услуга предназначена для взрослых. Она не заменяет психотерапию и экстренную помощь.</p><p>При угрозах, насилии, преследовании, принуждении, страхе за безопасность или риске причинения вреда себе обычный разбор не проводится. Подходит ли запрос, уточняем до оплаты.</p></aside></section>
-      <section class="faq" aria-labelledby="faq-title"><span class="eyebrow">Ещё несколько деталей</span><h2 class="section-title" id="faq-title">До того как записаться.</h2>
-        <details><summary>Почему не просто спросить у ИИ?</summary><p>Вы можете пользоваться ИИ самостоятельно. Здесь предлагается определённый объём услуги: письменный разбор с проверкой человеком и до двух корректировок по фактическому результату. Мы не обещаем, что ответ всегда окажется лучше самостоятельного запроса. Пример выше поможет оценить, нужен ли вам такой формат.</p></details>
-        <details><summary>Нужно ли участие партнёра?</summary><p>Нет, можно начать одному. Разбор касается ваших действий и сообщённых фактов. Мы не пишем партнёру и не просим его контакты.</p></details>
-        <details><summary>Что именно означает «7 дней»?</summary><p>Период начинается с выдачи первого разбора. В течение семи дней можно прислать до двух запросов на корректировку. На каждый ответим в течение 24 часов, даже если своевременный запрос поступил в последний день. Безлимитной переписки в формате нет.</p></details>
-        <details><summary>Можно ли оплатить и отправить историю сейчас?</summary><p>Пока нет. Сейчас можно сообщить об интересе к пилоту или задать общий вопрос о формате. До приёма оплаты мы пришлём условия оказания услуги, порядок отмены и возврата, информацию об обработке данных и способ передачи анкеты. Личную историю на этапе записи отправлять не нужно.</p></details>
-      </section>
-    </div>
-    <section class="join-section" id="join" aria-labelledby="join-title"><div class="wrap join"><div><span class="eyebrow">Первый шаг — без оплаты</span><h2 id="join-title">Хотите попробовать<br>пилот за 990 ₽?</h2><p>Напишите, что вам интересен формат. Когда пилот будет готов, ответим с условиями и дальнейшими шагами. После этого вы сможете решить, участвовать ли.</p><p class="join-caption">Запись означает только интерес. Она не создаёт платный заказ, не бронирует место и не обязывает покупать.</p></div><div class="join-action"><a class="btn" href="mailto:moverelationship@gmail.com?subject=%D0%9F%D0%B8%D0%BB%D0%BE%D1%82%20990&amp;body=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%9C%D0%BD%D0%B5%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%B5%D0%BD%20%D0%BF%D0%B8%D0%BB%D0%BE%D1%82%20%C2%AB%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%20%D1%81%D1%81%D0%BE%D1%80%D1%8B%C2%BB%20%D0%B7%D0%B0%20990%20%E2%82%BD.%20%D0%9F%D1%80%D0%B8%D1%88%D0%BB%D0%B8%D1%82%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0%2C%20%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F%2C%20%D0%BA%D0%BE%D0%B3%D0%B4%D0%B0%20%D0%BE%D0%BD%20%D0%B1%D1%83%D0%B4%D0%B5%D1%82%20%D0%B3%D0%BE%D1%82%D0%BE%D0%B2.">Открыть письмо о записи <span aria-hidden="true">↗</span></a><p class="email-fallback">Если почтовая программа не открылась, напишите на</p><a class="email-address" href="mailto:moverelationship@gmail.com">moverelationship@gmail.com</a><p class="fine">Тема: «Пилот 990». Достаточно сообщения об интересе — без личной истории, имён и переписок.</p></div><div class="contact-process"><h3>Как обрабатывается обращение</h3><p>Кнопка открывает черновик в вашей почтовой программе. Письмо уйдёт только после того, как вы сами его отправите. Мы получим ваш адрес и текст письма, прочитаем обращение и ответим вручную по поводу пилота. На этой странице нет формы сбора анкет; текст письма сайт не получает. Новости проекта можно читать в <a href="https://t.me/relationship_reset">Telegram-канале</a>.</p></div></div></section>
-  </main>
-  <footer class="wrap footer"><div><p><strong>Продавец услуги — София Мурмановна Липартелиани</strong><br>Самозанятая · ИНН 760605353023<br>Отвечает за оказание услуги, сроки и рассмотрение обращений.</p></div><div class="footer-links"><a href="mailto:moverelationship@gmail.com">Написать нам</a><a href="https://t.me/relationship_reset">Telegram ↗</a><a href="#join">Запись в пилот</a></div><p class="footer-note">После ссоры / Relationship Reset · Предварительное знакомство с пилотом. Оплата и приём личных историй пока не открыты.</p></footer>
-</body>
-</html>
+    <aside class="sample-stage" aria-label="Фрагмент вымышленного разбора">
+      <div class="sample-topline"><span>Меньше догадок.</span><span>Один понятный шаг.</span></div>
+      <article class="sample-paper">
+        <p class="document-label">Фрагмент разбора <span>Вымышленный пример</span></p>
+        <p class="sample-story">«Партнёр попросил паузу.<br>Я снова написал —<br>стало только хуже».</p>
+        <div class="sample-rule"></div>
+        <p class="small-label">Что известно</p>
+        <p>Была просьба о паузе. Новое сообщение усилило напряжение. О чувствах партнёра мы пока не знаем.</p>
+        <div class="sample-action"><p class="small-label">Ваш следующий шаг</p><h2>Сейчас — выдержать паузу.</h2><p>Не добавлять ещё одно сообщение. Подготовить заметку для себя, без отправки.</p></div>
+        <div class="document-footer"><span>Факты → границы → действие</span><span>01</span></div>
+      </article>
+      <p class="sample-caption">Не универсальный совет. Шаг зависит от ситуации.</p>
+    </aside>
+  </section>
+  <div class="benefit-line shell" aria-label="Особенности формата"><p><strong>Можно начать одному</strong><span>Участие партнёра не требуется</span></p><p><strong>Без обязательного созвона</strong><span>Ответ, к которому можно вернуться</span></p><p><strong>С проверкой человеком</strong><span>ИИ помогает подготовить черновик</span></p></div>
+  <section class="section shell relevance" aria-labelledby="fit-title">
+    <div class="section-heading"><p class="eyebrow">Когда хочется ясности</p><h2 id="fit-title">Не всегда понятно,<br>что поможет сейчас.</h2></div>
+    <div class="situations"><article><span class="item-number">01</span><h3>Хочется написать ещё раз</h3><p>Но непонятно, станет ли от нового сообщения лучше.</p></article><article><span class="item-number">02</span><h3>Вы уже извинились</h3><p>А напряжение осталось. Повторять то же самое не хочется.</p></article><article><span class="item-number">03</span><h3>Ссоры идут по кругу</h3><p>Нужен небольшой шаг, который учитывает прошлые попытки.</p></article></div>
+    <p class="fit-note">Формат для взрослых после обычного конфликта. При угрозах, насилии, принуждении или страхе за безопасность он не подходит.</p>
+  </section>
+  <section class="example-section" id="example" aria-labelledby="example-title"><div class="shell section">
+    <div class="section-heading split-heading"><div><p class="eyebrow">Сначала посмотрите результат</p><h2 id="example-title">Не «просто поговорите».<br>Шаг с учётом ваших обстоятельств.</h2></div><p>Ниже — вымышленная ситуация и образец ответа. Это пример формата, а не история клиента или обещание примирения.</p></div>
+    <div class="full-example"><aside class="case-story"><p class="small-label">Ситуация</p><blockquote>«После ссоры партнёр попросил оставить его в покое. Я хотел объясниться и отправил ещё одно сообщение. Он разозлился. Как теперь всё исправить?»</blockquote><p class="quiet">В примере нет насилия и угроз.</p></aside>
+    <article class="review-document" aria-label="Полный вымышленный пример разбора"><div class="review-heading"><h3>Ваш разбор</h3><span>Пример</span></div>
+      <div class="review-row"><span class="review-index">01</span><div><h4>Что можно сказать по фактам</h4><p>Партнёр прямо попросил паузу. Попытка объясниться усилила напряжение. Мы не знаем, что он чувствует и чего хочет дальше.</p></div></div>
+      <div class="review-row highlighted"><span class="review-index">02</span><div><h4>Один шаг сейчас</h4><p>Не отправляйте новое сообщение. Для себя запишите, за какой конкретный поступок готовы отвечать и что можете изменить в своём поведении. Эта заметка пока остаётся у вас.</p></div></div>
+      <div class="review-row"><span class="review-index">03</span><div><h4>Чего избегать</h4><p>Не обходите паузу звонками, подарками или сообщениями через знакомых. Прошедшее время само по себе не отменяет просьбу о пространстве.</p></div></div>
+      <div class="review-row"><span class="review-index">04</span><div><h4>К чему вернуться в корректировке</h4><p>Удалось ли выдержать паузу? Возобновил ли партнёр контакт по своей инициативе? Появились ли новые факты или границы?</p></div></div>
+    </article></div>
+  </div></section>
+  <section class="section shell" id="format" aria-labelledby="format-title">
+    <div class="section-heading split-heading"><div><p class="eyebrow">Что будет в пилоте</p><h2 id="format-title">Одна ситуация.<br>Семь дней внимания к ней.</h2></div><p>Первый разбор и до двух возвращений с новыми фактами. Один и тот же объём услуги для каждого участника.</p></div>
+    <ol class="process"><li><span class="item-number">01</span><div><h3>Расскажете, что произошло</h3><p>После запуска — короткая анкета о ситуации, ваших попытках и границах контакта. До оплаты уточним, подходит ли запрос для этого формата.</p></div><span class="process-detail">Без созвона</span></li><li><span class="item-number">02</span><div><h3>Получите первый разбор</h3><p>Факты, один следующий шаг и то, чего лучше избегать. ИИ поможет с черновиком; человек проверит ответ перед выдачей.</p></div><span class="process-detail">В течение 24 часов*</span></li><li><span class="item-number">03</span><div><h3>Вернётесь с тем, что изменилось</h3><p>В течение семи дней с первого ответа можно прислать до двух запросов на корректировку. Ответ на каждый — в течение 24 часов.</p></div><span class="process-detail">До двух корректировок</span></li></ol>
+    <p class="quiet timing-note">* После получения заполненной анкеты и подтверждения оплаты. Запрос на корректировку в последний день также получит ответ в течение 24 часов.</p>
+  </section>
+  <section class="human-section"><div class="shell human-layout"><div><p class="eyebrow">Кто готовит ответ</p><h2>ИИ — для черновика.<br>Человек — для проверки.</h2><p>Перед отправкой человек сверяет ответ с вашей историей: не появились ли выдуманные факты, не повторяется ли неудачная попытка, учтены ли границы партнёра.</p><p class="human-limits">Это не психотерапия и не диагностика. Мы не определяем скрытые мотивы партнёра и не обещаем вернуть отношения.</p></div><aside class="responsibility"><p class="small-label">Кто отвечает за услугу</p><h3>София Мурмановна Липартелиани</h3><p>Самозанятая. Отвечает за оказание услуги, сроки, поддержку и рассмотрение обращений о возврате.</p><a href="mailto:moverelationship@gmail.com" class="contact-link">moverelationship@gmail.com</a><p class="quiet">По общим вопросам о формате.<br>Личную историю пока присылать не нужно.</p></aside></div></section>
+  <section class="section shell offer-layout" id="join" aria-labelledby="join-title"><div class="offer-copy"><p class="eyebrow">Первая группа · планируемый пилот</p><h2 id="join-title">Начните с ясности<br>о самом формате.</h2><p>Напишите, если вам интересен разбор за 990 ₽. Когда пилот будет готов, сообщим условия и порядок участия. Решение об оплате сможете принять после этого.</p><p class="contact-instruction">Сейчас достаточно: «Мне интересен пилот».<br>Без анкеты, личной истории и чужой переписки.</p></div><aside class="price-panel" aria-label="Цена и условия пилота"><p class="small-label">7-дневный разбор после ссоры</p><p class="offer-price">990 ₽<span>разовая оплата после запуска</span></p><ul class="included"><li>Первый письменный разбор</li><li>До 2 корректировок по новым фактам</li><li>7 дней с момента первого ответа</li><li>Проверка каждого ответа человеком</li></ul><p class="price-note">Для первых 3 покупателей. Без подписки, автопродления и безлимитного чата.</p><a href="mailto:moverelationship@gmail.com?subject=%D0%9F%D0%B8%D0%BB%D0%BE%D1%82%20990&amp;body=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9C%D0%BD%D0%B5%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%B5%D0%BD%20%D0%BF%D0%B8%D0%BB%D0%BE%D1%82%20%C2%AB%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%20%D1%81%D1%81%D0%BE%D1%80%D1%8B%C2%BB%20%D0%B7%D0%B0%20990%20%E2%82%BD.%20%D0%A1%D0%BE%D0%BE%D0%B1%D1%89%D0%B8%D1%82%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0%2C%20%D0%BA%D0%BE%D0%B3%D0%B4%D0%B0%20%D0%BE%D0%BD%20%D0%B1%D1%83%D0%B4%D0%B5%D1%82%20%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%20%D0%B8%20%D0%BA%D0%B0%D0%BA%D0%B8%D0%B5%20%D0%B1%D1%83%D0%B4%D1%83%D1%82%20%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F.%0A%0A%D0%AD%D1%82%D0%BE%20%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%B8%2C%20%D0%B1%D0%B5%D0%B7%20%D0%B0%D0%BD%D0%BA%D0%B5%D1%82%D1%8B%20%D0%B8%20%D0%BB%D0%B8%D1%87%D0%BD%D0%BE%D0%B9%20%D0%B8%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8." class="button button-primary">Написать о пилоте</a><p class="mailto-note">Откроется ваша почта. Письмо — запрос информации, не заказ и не бронирование. Оплата сейчас не принимается.</p><p class="email-fallback">Если кнопка не открылась, напишите на<br><a href="mailto:moverelationship@gmail.com" class="">moverelationship@gmail.com</a></p></aside></section>
+  <section class="section shell faq-layout" id="questions" aria-labelledby="questions-title"><div class="section-heading"><p class="eyebrow">Перед решением</p><h2 id="questions-title">О чём ещё<br>важно знать</h2></div><div class="faq-list"><details class="question"><summary>Можно обратиться без участия партнёра?</summary><p>Да. Разбор касается ваших действий и тех фактов, которые вы сообщите. Мы не связываемся с партнёром и не просим его контакты. Если партнёр попросил паузу или запретил контакт, это граница, которую нужно соблюдать.</p></details>
+<details class="question"><summary>Почему не просто спросить у ИИ?</summary><p>Вы можете пользоваться ИИ самостоятельно. Здесь планируется конкретная услуга: письменный разбор, проверка каждого ответа человеком и до двух корректировок по новым фактам. Мы не обещаем, что любой наш ответ будет лучше самостоятельного запроса. Пример выше поможет оценить, нужен ли вам такой формат.</p></details>
+<details class="question"><summary>Когда я получу ответ?</summary><p>После открытия пилота первый разбор — в течение 24 часов после двух событий: получения заполненной анкеты и подтверждения оплаты. Семь дней начинаются с выдачи первого разбора. На каждый из двух запросов на корректировку, присланных в этот период, — ответ в течение 24 часов, включая запрос в последний день.</p></details>
+<details class="question"><summary>А если мы всё равно не помиримся?</summary><p>Разбор не гарантирует примирения и не может управлять чувствами другого человека. Его задача — помочь обдумать собственные действия. Подходящим шагом может оказаться пауза или отказ от дальнейшего контакта. Это не психотерапия, не диагностика и не экстренная помощь.</p></details>
+<details class="question"><summary>Что с оплатой и возвратами?</summary><p>Сейчас собираем интерес: оплата и приём анкет ещё не открыты. До начала продаж опубликуем окончательные условия оплаты, получения услуги и возврата. В проекте условий предусмотрен полный возврат при отмене до первого персонального ответа. Письмо о пилоте не создаёт заказ и ни к чему вас не обязывает.</p></details>
+<details class="question"><summary>Можно сейчас прислать свою историю?</summary><p>Пока достаточно короткого письма об интересе к пилоту. Не присылайте анкету, переписку, имена или другие чувствительные сведения. Порядок передачи, хранения и удаления данных для платного разбора будет опубликован до начала продаж.</p></details></div></section>
+  <aside class="safety-note shell"><h2>Если сейчас небезопасно</h2><p>При угрозах, насилии или риске причинить вред себе в первую очередь нужна помощь по безопасности. При непосредственной опасности обратитесь в местные экстренные службы, когда это безопасно. Этот сервис не является кризисной службой.</p></aside>
+</main>
+<footer class="site-footer shell"><div class="footer-main"><a class="wordmark" href="#top" aria-label="После ссоры — в начало"><span class="brand-icon" aria-hidden="true">пс</span><span>после ссоры<span class="brand-caption">RELATIONSHIP RESET</span></span></a><div><a href="https://t.me/relationship_reset" class="">Канал проекта в Telegram</a><a href="mailto:moverelationship@gmail.com" class="">moverelationship@gmail.com</a></div></div><div class="footer-fine"><p>Самозанятая София Мурмановна Липартелиани<br>ИНН 760605353023</p><p>Сейчас принимаем только письма об интересе.<br>Условия оплаты, возвратов и обработки анкет опубликуем до продаж.</p></div><p class="footer-privacy">На этой странице нет формы, аналитических счётчиков и передачи анкеты в ИИ. Отправленное вами письмо поступит на почту продавца; почтовый сервис обрабатывает его по своим правилам. Хостинг может вести технические журналы запросов.</p></footer>
+</body></html>

@@ -3,9 +3,9 @@ name: Pilot interest page — validate and package
 on:
   push:
     branches: [pilot-interest-20260929, m1-first-payment-20260925]
-    paths: ['pilot.html', 'docs/PILOT_*.md', 'scripts/*pilot*.py', 'scripts/deploy_pilot.sh', 'scripts/deploy_beget_remote.py', 'tests/pilot_receiver_test.py', '.github/workflows/pilot-page.yml']
+    paths: ['frontend/**', 'package.json', 'package-lock.json', 'pilot.html', 'docs/PILOT_*.md', 'scripts/*pilot*.py', 'scripts/deploy_pilot.sh', 'scripts/deploy_beget_remote.py', 'tests/pilot_receiver_test.py', 'tests/frontend*', '.github/workflows/pilot-page.yml']
   pull_request:
-    paths: ['pilot.html', 'docs/PILOT_*.md', 'scripts/*pilot*.py', 'scripts/deploy_pilot.sh', 'scripts/deploy_beget_remote.py', 'tests/pilot_receiver_test.py', '.github/workflows/pilot-page.yml']
+    paths: ['frontend/**', 'package.json', 'package-lock.json', 'pilot.html', 'docs/PILOT_*.md', 'scripts/*pilot*.py', 'scripts/deploy_pilot.sh', 'scripts/deploy_beget_remote.py', 'tests/pilot_receiver_test.py', 'tests/frontend*', '.github/workflows/pilot-page.yml']
   workflow_dispatch:
 
 permissions:
@@ -23,6 +23,15 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5; same pinned action as Kotlin CI
         with:
           persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5; official ref verified
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Check TypeScript frontend and committed output
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build:check
+          npm test
       - name: Validate publication boundary and receiver upgrade
         run: |
           bash -n scripts/deploy_pilot.sh

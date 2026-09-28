@@ -1,4 +1,6 @@
 dist/
+node_modules/
+.frontend-build/
 __pycache__/
 *.pyc
 .env
@@ -14,4 +16,3 @@ id_ed25519*
 id_rsa*
 *.sql.gz
 *.sqlite*
-
