@@ -74,7 +74,7 @@ class StaticPage(HTMLParser):
                     parsed = urlsplit(href)
                     require(parsed.scheme == "mailto" and not parsed.netloc and not parsed.fragment
                             and parsed.path == "moverelationship@gmail.com", "Unapproved external link")
-                    query = parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True)
+                    query = parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True) if parsed.query else []
                     require(len(query) <= 2 and len({key for key, _ in query}) == len(query)
                             and all(key in ("subject", "body") for key, _ in query), "Unapproved mail parameter")
         if tag == "meta":
