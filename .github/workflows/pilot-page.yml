@@ -1,0 +1,43 @@
+name: Pilot interest page — validate and package
+
+on:
+  push:
+    branches: [pilot-interest-20260929, m1-first-payment-20260925]
+    paths: ['pilot.html', 'docs/PILOT_*.md', 'scripts/*pilot*.py', 'scripts/deploy_pilot.sh', 'scripts/deploy_beget_remote.py', 'tests/pilot_receiver_test.py', '.github/workflows/pilot-page.yml']
+  pull_request:
+    paths: ['pilot.html', 'docs/PILOT_*.md', 'scripts/*pilot*.py', 'scripts/deploy_pilot.sh', 'scripts/deploy_beget_remote.py', 'tests/pilot_receiver_test.py', '.github/workflows/pilot-page.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pilot-page-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5; same pinned action as Kotlin CI
+        with:
+          persist-credentials: false
+      - name: Validate publication boundary and receiver upgrade
+        run: |
+          bash -n scripts/deploy_pilot.sh
+          python3 tests/pilot_receiver_test.py
+      - name: Validate standalone interest page and build review archive
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: python3 scripts/package_pilot.py --release "$RELEASE_SHA"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4; official ref verified
+        with:
+          name: pilot-interest-review
+          path: dist/pilot-interest-review.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  # Publication belongs to beget-staging.yml: one validated commit uploads the
+  # staging files and pilot page sequentially, through the existing Environment.
+  # This review workflow never receives deployment secrets or opens an SSH session.

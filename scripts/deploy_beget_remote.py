@@ -201,6 +201,11 @@ def install(private_root: Path, files: dict[str, bytes], manifest: dict, php: st
 
 
 def main() -> None:
+    pilot = re.fullmatch(r"rr-publish-pilot ([0-9a-f]{40}) ([0-9a-f]{64})", os.environ.get("SSH_ORIGINAL_COMMAND", ""))
+    if pilot:
+        from publish_pilot_remote import main as publish_pilot
+        publish_pilot(pilot[1], pilot[2])
+        return
     match = re.fullmatch(r"rr-deploy ([0-9a-f]{40}) ([0-9a-f]{64})", os.environ.get("SSH_ORIGINAL_COMMAND", ""))
     if not match:
         raise ValueError("Only the exact staging deployment command is allowed")

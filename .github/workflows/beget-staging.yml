@@ -44,11 +44,12 @@ jobs:
       - name: Validate source and deployment boundaries
         run: |
           find backend api tests -name '*.php' -print0 | xargs -0 -n1 php8.3 -l
-          bash -n scripts/deploy_beget.sh scripts/receive_beget.sh scripts/install_beget_receiver.sh
+          bash -n scripts/deploy_beget.sh scripts/deploy_pilot.sh scripts/receive_beget.sh scripts/install_beget_receiver.sh
           node --test tests/reset-logic.test.cjs
           php8.3 tests/backend-unit.php
           python3 tests/deploy_test.py
           python3 tests/configure_beget_test.py
+          python3 tests/pilot_receiver_test.py
       - name: Test API against disposable MySQL 8.4
         env:
           RR_CONFIG_FILE: ${{ runner.temp }}/rr-ci-config.php
@@ -64,7 +65,9 @@ jobs:
       - name: Validate deploy archive
         env:
           RELEASE_SHA: ${{ github.sha }}
-        run: python3 scripts/package_backend.py --release "$RELEASE_SHA"
+        run: |
+          python3 scripts/package_backend.py --release "$RELEASE_SHA"
+          python3 scripts/package_pilot.py --release "$RELEASE_SHA"
 
   deploy:
     needs: validate
@@ -83,7 +86,9 @@ jobs:
       - name: Build exact validated commit
         env:
           RELEASE_SHA: ${{ github.sha }}
-        run: python3 scripts/package_backend.py --release "$RELEASE_SHA"
+        run: |
+          python3 scripts/package_backend.py --release "$RELEASE_SHA"
+          python3 scripts/package_pilot.py --release "$RELEASE_SHA"
       - name: Deploy through restricted SSH key
         env:
           RELEASE_SHA: ${{ github.sha }}
@@ -94,3 +99,14 @@ jobs:
           BEGET_SSH_KNOWN_HOSTS: ${{ secrets.BEGET_SSH_KNOWN_HOSTS }}
           BEGET_HEALTH_URL: ${{ vars.BEGET_HEALTH_URL }}
         run: bash scripts/deploy_beget.sh dist/relationship-reset-beget-staging.tar.gz "$RELEASE_SHA"
+      # One deployment job owns both uploads. Independent workflows can cancel
+      # each other's pending runs or race the receiver's nonblocking lock.
+      - name: Publish pilot page and verify exact HTTPS content
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+          BEGET_SSH_HOST: ${{ secrets.BEGET_SSH_HOST }}
+          BEGET_SSH_USER: ${{ secrets.BEGET_SSH_USER }}
+          BEGET_SSH_PORT: ${{ vars.BEGET_SSH_PORT }}
+          BEGET_SSH_PRIVATE_KEY: ${{ secrets.BEGET_SSH_PRIVATE_KEY }}
+          BEGET_SSH_KNOWN_HOSTS: ${{ secrets.BEGET_SSH_KNOWN_HOSTS }}
+        run: bash scripts/deploy_pilot.sh dist/pilot-interest-review.zip "$RELEASE_SHA"
