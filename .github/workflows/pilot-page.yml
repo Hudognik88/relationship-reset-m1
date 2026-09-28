@@ -1,4 +1,4 @@
-name: Pilot interest page — validate and publish
+name: Pilot interest page — validate and package
 
 on:
   push:
@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: beget-staging-${{ github.ref }}
-  cancel-in-progress: false
+  group: pilot-page-review-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   package:
@@ -38,31 +38,6 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-  publish:
-    needs: package
-    # Enable only AFTER the owner installs the reviewed receiver upgrade once.
-    # Keep existing environment branch restrictions and the restricted SSH key.
-    if: >-
-      github.event_name != 'pull_request' &&
-      github.ref == 'refs/heads/m1-first-payment-20260925' &&
-      vars.BEGET_PILOT_DEPLOY_ENABLED == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    environment: beget-staging
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          persist-credentials: false
-      - name: Package exact validated commit
-        env:
-          RELEASE_SHA: ${{ github.sha }}
-        run: python3 scripts/package_pilot.py --release "$RELEASE_SHA"
-      - name: Publish only pilot.html through restricted SSH
-        env:
-          RELEASE_SHA: ${{ github.sha }}
-          BEGET_SSH_HOST: ${{ secrets.BEGET_SSH_HOST }}
-          BEGET_SSH_USER: ${{ secrets.BEGET_SSH_USER }}
-          BEGET_SSH_PORT: ${{ vars.BEGET_SSH_PORT }}
-          BEGET_SSH_PRIVATE_KEY: ${{ secrets.BEGET_SSH_PRIVATE_KEY }}
-          BEGET_SSH_KNOWN_HOSTS: ${{ secrets.BEGET_SSH_KNOWN_HOSTS }}
-        run: bash scripts/deploy_pilot.sh dist/pilot-interest-review.zip "$RELEASE_SHA"
+  # Publication belongs to beget-staging.yml: one validated commit uploads the
+  # staging files and pilot page sequentially, through the existing Environment.
+  # This review workflow never receives deployment secrets or opens an SSH session.
