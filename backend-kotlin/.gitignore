@@ -1,0 +1,6 @@
+target/
+.secrets/
+.env
+.env.*
+*.dump
+*.sql.gz

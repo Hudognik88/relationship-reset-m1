@@ -2,7 +2,13 @@
 
 Existing Relationship Reset project, adapted for the Russian-speaking paid-pilot hypothesis on 25 September 2026. The public frontend remains static. This branch also includes the first staging PHP/MySQL backend and Beget deployment tooling. The international $149 / 30-day hypothesis is deferred in the existing sales package; the prior code remains in Git history.
 
-## Conversion update — staging only, no commercial release
+## Kotlin migration — 26 September 2026
+
+The Kotlin/Ktor staging service is developed separately in [backend-kotlin](backend-kotlin/README_RU.md). It preserves the PHP API contract, the exact MySQL migration and retry semantics. Its workflow builds and tests the service and container; it does not switch Beget hosting. The existing PHP deployment remains the fallback. Both backends are operator-only rehearsals with fictional data; client accounts, real orders and payment integration are subsequent work.
+
+The Beget PHP deployment, MySQL setup and authenticated HTTPS readiness check were completed after the earlier snapshot below. Kotlin hosting has not been provisioned or switched. See [three fictional pilot examples and interview questions](docs/PILOT_EXAMPLES_RU.md) for the parallel product work.
+
+## Earlier conversion snapshot — staging only, no commercial release
 
 Status as of **25 September 2026, 19:18 Moscow time**: the user has created the Beget account and purchased **poslessory.ru**, as confirmed by the domain/DNS/SSL screenshots. Six public staging files have been uploaded to `movereed.beget.tech/public_html`. An Android screenshot confirms the first screen on the technical domain; the full questionnaire flow, HTTPS and public operation of the final domain have not been verified. The existing repository, `main` and GitHub Pages demo remain unchanged. The commercial release is not open. Keep the repository and history; complete the deployment on Beget and the purchased domain rather than registering another account or buying the domain again.
 
@@ -14,7 +20,7 @@ The draft lowers the sequential price test to **RUB 990 for the first three inde
 - Planned paid pilot: 7 days from first delivery, first personalized answer + two outcome-based revisions. First three independent buyers: RUB 990; next seven: RUB 1,490. RUB 2,490 is deferred. No subscription or unlimited chat.
 - AI drafts and human review apply to the planned **paid** service. The free page uses deterministic JavaScript rules, not an LLM or human review.
 - First paid answer: within 24 hours after both verified payment and receipt of intake. Follow-ups requested during the seven days: response within 24 hours.
-- **No payment links, checkout, order collection, analytics, AI API, or backend are enabled.** Opening `success.html` does not verify payment or submit an order.
+- **No payment links, checkout, order collection, analytics, AI API, or backend connection are enabled in the public frontend.** Opening `success.html` does not verify payment or submit an order.
 
 ## Safety and data behavior
 
