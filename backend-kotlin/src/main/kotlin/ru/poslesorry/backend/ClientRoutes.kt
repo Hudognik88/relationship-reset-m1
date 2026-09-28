@@ -202,7 +202,7 @@ private suspend fun ApplicationCall.operatorDispatch(path: String, store: Client
     }
 }
 
-private fun ApplicationCall.cookieToken(): String? {
+internal fun ApplicationCall.cookieToken(): String? {
     val values = request.headers.getAll(HttpHeaders.Cookie).orEmpty().flatMap { it.split(';') }.map { it.trim() }
         .filter { it.substringBefore('=') == COOKIE }.map { it.substringAfter('=', "") }
     if (values.isEmpty()) return null
@@ -210,7 +210,7 @@ private fun ApplicationCall.cookieToken(): String? {
     return values.single()
 }
 
-private fun csrf(token: String) = Contract.sha256("csrf:" + token)
+internal fun csrf(token: String) = Contract.sha256("csrf:" + token)
 private fun sessionBody(token: String, expires: Instant, hasAccessKey: Boolean = false) = buildJsonObject { put("authenticated", true); put("csrf_token", csrf(token)); put("expires_at", expires.toString()); put("has_access_key", hasAccessKey) }
 
 internal suspend fun ApplicationCall.limitedJson(): JsonElement {

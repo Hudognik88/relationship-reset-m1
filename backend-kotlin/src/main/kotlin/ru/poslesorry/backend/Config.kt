@@ -18,6 +18,7 @@ data class AppConfig(
     val allowLoopbackHttp: Boolean = false,
     val release: String? = null,
     val clientOrigin: String = "https://api-staging.poslessory.ru",
+    val payments: DemoPaymentConfig? = null,
 ) {
     companion object {
         fun fromEnvironment(env: Map<String, String> = System.getenv()): AppConfig {
@@ -48,7 +49,7 @@ data class AppConfig(
             require(localHttp in setOf("true", "false"))
             val release = env["RR_RELEASE"]?.takeIf { it.isNotEmpty() }
             require(release == null || release.matches(Regex("[a-f0-9]{40}")))
-            return AppConfig(hash, DatabaseConfig(dbHost, dbPort, dbName, required("RR_DB_USER"), password, ssl), listenHost, port, proxies, localHttp == "true", release)
+            return AppConfig(hash, DatabaseConfig(dbHost, dbPort, dbName, required("RR_DB_USER"), password, ssl), listenHost, port, proxies, localHttp == "true", release, payments = DemoPaymentConfig.fromEnvironment(env))
         }
     }
 }

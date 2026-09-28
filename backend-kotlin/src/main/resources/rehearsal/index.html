@@ -35,7 +35,7 @@
       </aside>
 
       <main id="main" class="workspace" tabindex="-1">
-        <div class="test-notice"><span class="notice-symbol" aria-hidden="true">i</span><p><strong>Тестовый кабинет.</strong> Используйте только вымышленные данные. Оплата не требуется.</p></div>
+        <div class="test-notice"><span class="notice-symbol" aria-hidden="true">i</span><p><strong>Тестовый кабинет.</strong> Используйте только вымышленные данные. Оплата не требуется. Приём реальных оплат здесь не открыт.</p></div>
         <noscript><div class="message error">Для работы кабинета нужен JavaScript. Включите его в настройках браузера и обновите страницу.</div></noscript>
         <div id="global-message" class="message" role="status" aria-live="polite" hidden></div>
 
@@ -122,7 +122,21 @@
           <details class="saved-case"><summary>Моя вымышленная ситуация</summary><p id="saved-situation"></p></details>
           <p id="case-error" class="field-error" role="alert" hidden></p>
           <button id="refresh-button" class="button secondary full" type="button">Проверить, появился ли разбор</button>
-          <div class="delete-area"><button id="delete-button" class="text-button danger" type="button">Удалить тестовый пример</button><div id="delete-confirmation" class="delete-confirmation" hidden><h3 id="delete-heading" tabindex="-1">Удалить этот пример?</h3><p>Анкета и разбор будут удалены из кабинета и рабочей базы. Ранее созданные резервные копии сохраняются.</p><div class="form-actions"><button id="cancel-delete-button" class="button secondary" type="button">Оставить</button><button id="confirm-delete-button" class="button danger-button" type="button">Удалить пример</button></div></div></div>
+          <section id="payment-panel" class="payment-panel" aria-labelledby="payment-heading" hidden>
+            <div class="payment-topline"><h3 id="payment-heading">Проверка демо-оплаты</h3><span id="payment-badge" class="status-pill">Демо</span></div>
+            <p class="payment-caption">Тестовая сумма — <strong>990 ₽</strong> за 7 дней. Это проверка сценария без реального списания денег.</p>
+            <p id="payment-status" class="payment-status" role="status" aria-live="polite">Проверяем доступность демо-оплаты…</p>
+            <p id="payment-key-note" class="field-help" hidden></p>
+            <button id="payment-key-confirm" class="text-button" type="button" hidden>Подтверждаю: ключ сохранён у меня</button>
+            <p id="payment-error" class="field-error" role="alert" hidden></p>
+            <div class="payment-actions">
+              <button id="payment-create-button" class="button primary full" type="button" hidden disabled>Создать демо-заказ на 990 ₽</button>
+              <a id="payment-checkout" class="button primary full" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" hidden>Открыть демо-оплату</a>
+              <button id="payment-refresh-button" class="text-button" type="button">Обновить статус демо-оплаты</button>
+            </div>
+            <p id="payment-return-note" class="field-help" hidden>Демо-оплата откроется в новой вкладке. После возвращения обновите статус здесь: переход обратно сам по себе не подтверждает оплату.</p>
+          </section>
+          <div class="delete-area"><button id="delete-button" class="text-button danger" type="button">Удалить тестовый пример</button><div id="delete-confirmation" class="delete-confirmation" hidden><h3 id="delete-heading" tabindex="-1">Удалить этот пример?</h3><p>Анкета и разбор будут удалены из кабинета и рабочей базы. Ранее созданные резервные копии сохраняются. Связанный тестовый заказ не переносится в новую анкету.</p><div class="form-actions"><button id="cancel-delete-button" class="button secondary" type="button">Оставить</button><button id="confirm-delete-button" class="button danger-button" type="button">Удалить пример</button></div></div></div>
         </section>
         <footer class="workspace-footer"><span>После ссоры</span><span>Один спокойный шаг за раз</span></footer>
       </main>

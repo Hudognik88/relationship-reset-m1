@@ -17,15 +17,19 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     try {
-        require(args.isEmpty() || args.contentEquals(arrayOf("migrate")) || args.contentEquals(arrayOf("migrate-client")))
+        require(args.isEmpty() || args.contentEquals(arrayOf("migrate")) || args.contentEquals(arrayOf("migrate-client")) || args.contentEquals(arrayOf("migrate-payments")))
         val config = AppConfig.fromEnvironment()
         val ds = dataSource(config.database)
         if (args.isNotEmpty()) {
-            ds.use { Migrations(it).run(); if (args[0] == "migrate-client") ClientMigrations(it).run() }
+            ds.use {
+                Migrations(it).run()
+                if (args[0] in setOf("migrate-client", "migrate-payments")) ClientMigrations(it).run()
+                if (args[0] == "migrate-payments") PaymentMigrations(it).run()
+            }
             println("Schema ready.")
         } else {
             val server = embeddedServer(Netty, host = config.host, port = config.port) {
-                api(config, JdbcCaseStore(ds), JdbcClientStore(ds), JdbcOwnerStore(ds))
+                api(config, JdbcCaseStore(ds), JdbcClientStore(ds), JdbcOwnerStore(ds), JdbcPaymentStore(ds))
                 monitor.subscribe(ApplicationStopped) { ds.close() }
             }
             server.start(wait = true)
@@ -37,9 +41,10 @@ fun main(args: Array<String>) {
     }
 }
 
-fun Application.api(config: AppConfig, store: CaseStore, clientStore: ClientStore? = null, ownerStore: OwnerStore? = null) {
+fun Application.api(config: AppConfig, store: CaseStore, clientStore: ClientStore? = null, ownerStore: OwnerStore? = null, paymentStore: PaymentStore? = null) {
     if (clientStore != null) clientApi(config, clientStore, ownerStore = ownerStore)
     if (ownerStore != null) ownerApi(config, ownerStore)
+    if (paymentStore != null && clientStore != null) paymentApi(config, clientStore, paymentStore)
     routing {
         route("/api/health.php") {
             handle {

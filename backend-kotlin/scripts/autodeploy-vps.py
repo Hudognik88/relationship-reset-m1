@@ -45,6 +45,7 @@ FROZEN = frozenset({WORKFLOW_PATH, ".dockerignore", "backend-kotlin/.dockerignor
                     "backend-kotlin/pom.xml", "backend-kotlin/scripts/smoke-vps.py",
                     "backend-kotlin/scripts/smoke-client-vps.py", "backend-kotlin/scripts/client-admin-vps.py",
                     "backend-kotlin/scripts/smoke-workspace-vps.py",
+                    "backend-kotlin/scripts/smoke-payments-vps.py",
                     "backend-kotlin/scripts/autodeploy-vps.py", "backend-kotlin/scripts/backup-vps.py",
                     "backend-kotlin/scripts/setup-autodeploy-vps.py"})
 REQUIRED_FROZEN = FROZEN - {".dockerignore", "backend-kotlin/.dockerignore",
@@ -259,6 +260,7 @@ def validate_trusted_assets(baseline):
                          ("smoke-vps.py", "backend-kotlin/scripts/smoke-vps.py"),
                          ("smoke-client-vps.py", "backend-kotlin/scripts/smoke-client-vps.py"),
                          ("smoke-workspace-vps.py", "backend-kotlin/scripts/smoke-workspace-vps.py"),
+                         ("smoke-payments-vps.py", "backend-kotlin/scripts/smoke-payments-vps.py"),
                          ("client-admin-vps.py", "backend-kotlin/scripts/client-admin-vps.py"),
                          ("autodeploy-vps.py", "backend-kotlin/scripts/autodeploy-vps.py"),
                          ("backup-vps.py", "backend-kotlin/scripts/backup-vps.py")):
@@ -333,6 +335,8 @@ def verify_release(release):
          "--secret-dir", str(APP / ".secrets")], timeout=180, capture=False)
     run(["python3", str(OPS / "smoke-workspace-vps.py"), "--release", release,
          "--secret-dir", str(APP / ".secrets")], timeout=180, capture=False)
+    run(["python3", str(OPS / "smoke-payments-vps.py"), "--release", release,
+         "--secret-dir", str(APP / ".secrets")], timeout=120, capture=False)
 
 
 def validate_runtime(release, expected_image):
@@ -474,6 +478,7 @@ def validate_host(config):
     protected(OPS / "smoke-vps.py")
     protected(OPS / "smoke-client-vps.py")
     protected(OPS / "smoke-workspace-vps.py")
+    protected(OPS / "smoke-payments-vps.py")
     protected(OPS / "client-admin-vps.py")
     protected(OPS / "Dockerfile")
     protected(APP / ".secrets", directory=True, mode=0o700)

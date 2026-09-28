@@ -33,6 +33,11 @@
   const requests = new Set();
   let operationId = 0;
   let sessionIdentity = null;
+  let currentCaseId = null;
+  let paymentState = null;
+  let paymentLoading = false;
+  let paymentEpoch = 0;
+  let pendingOrderPayload = null;
 
   class ApiError extends Error {
     constructor(status, code) { super(code); this.status = status; this.code = code; }
@@ -73,6 +78,7 @@
     document.querySelectorAll('button').forEach((button) => { button.disabled = value; });
     document.querySelectorAll('form input, form select, form textarea').forEach((input) => { input.disabled = value; });
     $(currentView).setAttribute('aria-busy', String(value));
+    syncPaymentActions();
     return operationId;
   }
   function updateStep(focus = true) {
@@ -175,8 +181,11 @@
   }
   function renderCase(result, focus = true) {
     if (!result || !result.case) {
+      clearPayment();
       showView('form-view', false); updateStep(focus); return false;
     }
+    if (typeof result.case.id !== 'string' || !result.case.id) throw new ApiError(0, 'invalid_response');
+    if (currentCaseId !== result.case.id) clearPayment(result.case.id);
     pendingPayload = null;
     const review = result.review && typeof result.review.text === 'string' ? result.review : null;
     $('waiting-content').hidden = Boolean(review); $('review-content').hidden = !review;
@@ -189,6 +198,106 @@
     showView('case-view', false);
     if (focus) $(review ? 'review-heading' : 'case-heading').focus();
     return true;
+  }
+  function clearPayment(caseId = null) {
+    paymentEpoch += 1; currentCaseId = caseId; paymentState = null; pendingOrderPayload = null; paymentLoading = false;
+    $('payment-panel').hidden = true;
+    $('payment-checkout').removeAttribute('href'); $('payment-checkout').hidden = true;
+    $('payment-create-button').hidden = true; $('payment-create-button').textContent = 'Создать демо-заказ на 990 ₽'; $('payment-return-note').hidden = true;
+    $('payment-key-note').hidden = true; $('payment-key-confirm').hidden = true;
+    $('payment-status').textContent = ''; $('payment-badge').textContent = 'Демо';
+    message('payment-error', ''); syncPaymentActions();
+  }
+  function checkoutUrl(value) {
+    if (typeof value !== 'string') return null;
+    try {
+      const url = new URL(value);
+      if (url.protocol !== 'https:' || url.hostname !== 'relationshipreset.payform.ru' || url.port || url.pathname !== '/' || url.username || url.password || url.hash) return null;
+      if (url.searchParams.getAll('demo_mode').length !== 1 || url.searchParams.get('demo_mode') !== '1' || url.searchParams.getAll('do').length !== 1 || url.searchParams.get('do') !== 'pay') return null;
+      return url.href;
+    } catch (_) { return null; }
+  }
+  function keyReadyForOrder() { return hasAccessKey && keySavedHere && !keyUncertain && !$('access-key').value; }
+  function hasCurrentOrder() { return Boolean(currentCaseId && paymentState?.order?.case_id === currentCaseId); }
+  function syncPaymentActions() {
+    $('payment-create-button').disabled = busy || paymentLoading || !currentCaseId || paymentState?.enabled !== true || hasCurrentOrder() || !keyReadyForOrder();
+    $('payment-refresh-button').disabled = busy || paymentLoading || !currentCaseId;
+    $('payment-key-confirm').disabled = busy || !hasAccessKey || keyUncertain || Boolean($('access-key').value);
+    $('payment-checkout').setAttribute('aria-disabled', String(busy || paymentLoading));
+    $('payment-checkout').tabIndex = busy || paymentLoading ? -1 : 0;
+    $('payment-panel').setAttribute('aria-busy', String(paymentLoading));
+  }
+  function renderPayment() {
+    $('payment-panel').hidden = !currentCaseId;
+    $('payment-checkout').hidden = true; $('payment-checkout').removeAttribute('href');
+    $('payment-create-button').hidden = true; $('payment-return-note').hidden = true;
+    $('payment-key-note').hidden = true; $('payment-key-confirm').hidden = true;
+    $('payment-badge').textContent = 'Демо'; $('payment-badge').classList.remove('ready');
+    if (!currentCaseId) { syncPaymentActions(); return; }
+    if (paymentLoading) $('payment-status').textContent = 'Проверяем статус демо-оплаты…';
+    else if (!paymentState) $('payment-status').textContent = 'Статус демо-оплаты пока неизвестен. Нажмите «Обновить статус», чтобы повторить проверку.';
+    else if (!paymentState.enabled) $('payment-status').textContent = 'Демо-оплата пока не подключена. Проверять анкету и разбор можно без неё.';
+    else if (!hasCurrentOrder()) {
+      $('payment-status').textContent = paymentState.order
+        ? 'Для прежней анкеты есть тестовый заказ. Новая анкета к нему не относится. Для неё можно создать отдельный демо-заказ.'
+        : 'Можно проверить создание заказа и подтверждение демо-оплаты для этой анкеты.';
+      $('payment-create-button').hidden = false;
+      if (!keyReadyForOrder()) {
+        $('payment-key-note').hidden = false;
+        $('payment-key-note').textContent = !hasAccessKey || keyUncertain || $('access-key').value
+          ? 'Сначала создайте и сохраните ключ в блоке «Чтобы вернуться позже» выше. Затем нажмите «Я сохранил(а) ключ».'
+          : 'Перед созданием заказа проверьте, что ключ кабинета сохранён у вас: он понадобится для возвращения.';
+        $('payment-key-confirm').hidden = !hasAccessKey || keyUncertain || Boolean($('access-key').value);
+      }
+    } else if (paymentState.order.status === 'review_required') {
+      $('payment-badge').textContent = 'Нужна проверка';
+      $('payment-status').textContent = 'Подтверждение тестового заказа требует проверки организатором. Сообщите ему, что видите этот статус.';
+    } else if (paymentState.order.status === 'paid') {
+      $('payment-badge').textContent = 'Демо подтверждено'; $('payment-badge').classList.add('ready');
+      const entitlement = paymentState.entitlement;
+      if (entitlement && entitlement.case_id === currentCaseId && entitlement.order_id === paymentState.order.id) {
+        const expires = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).format(new Date(entitlement.expires_at));
+        $('payment-status').textContent = entitlement.active
+          ? `Демо-оплата подтверждена сервером. Тестовый доступ на 7 дней действует до ${expires}. Это проверка сценария; деньги не списывались.`
+          : `Демо-оплата подтверждена сервером. Срок тестового доступа завершился ${expires}. Это проверка сценария; деньги не списывались.`;
+      } else $('payment-status').textContent = 'Демо-оплата подтверждена сервером. Тестовый доступ требует проверки организатором.';
+    } else {
+      $('payment-badge').textContent = 'Ожидаем подтверждение';
+      $('payment-status').textContent = 'Демо-заказ создан. Подтверждение появится после уведомления от платёжного сервиса.';
+      const url = paymentState.order.checkout_available === true ? checkoutUrl(paymentState.checkout_url) : null;
+      if (url) { $('payment-checkout').href = url; $('payment-checkout').hidden = false; $('payment-return-note').hidden = false; }
+      else $('payment-status').textContent += ' Ссылка на демо-оплату пока недоступна. Обновите статус или обратитесь к организатору.';
+    }
+    syncPaymentActions();
+  }
+  function acceptPayment(result) {
+    if (!result || typeof result.enabled !== 'boolean') throw new ApiError(0, 'invalid_response');
+    if (result.enabled && result.order) {
+      const order = result.order;
+      if (typeof order.id !== 'string' || typeof order.case_id !== 'string' || order.mode !== 'demo' || order.product !== 'pilot_7d' || order.currency !== 'RUB' || order.amount_minor !== 99000 || !['pending', 'paid', 'review_required'].includes(order.status)) throw new ApiError(0, 'invalid_response');
+      if (result.entitlement && (typeof result.entitlement.active !== 'boolean' || !Number.isFinite(new Date(result.entitlement.expires_at).getTime()))) throw new ApiError(0, 'invalid_response');
+    }
+    paymentState = result;
+  }
+  async function loadPayment() {
+    if (!currentCaseId || !csrfToken) return;
+    const epoch = paymentEpoch; const caseId = currentCaseId;
+    paymentLoading = true; message('payment-error', ''); renderPayment();
+    try {
+      const result = await request('/client/orders');
+      if (epoch !== paymentEpoch || caseId !== currentCaseId) return;
+      acceptPayment(result);
+    } catch (error) {
+      if (epoch !== paymentEpoch || error.code === 'stale_session') return;
+      paymentState = null;
+      await handleError(error, 'payment-error');
+    } finally { if (epoch === paymentEpoch) { paymentLoading = false; renderPayment(); } }
+  }
+  async function loadCurrentCase(focus = true) {
+    const result = await request('/client/case');
+    renderCase(result, focus);
+    if (result.case) await loadPayment();
+    return result;
   }
   function resetForm() {
     form.reset(); pendingPayload = null; step = 0; updateStep(false);
@@ -208,6 +317,7 @@
   function updateAccessStatus() {
     $('create-access-button').textContent = hasAccessKey ? 'Заменить ключ' : 'Сохранить ключ кабинета';
     $('access-status').textContent = keyUncertain ? 'Перед выходом получите и сохраните новый ключ. Прежний ключ уже мог перестать работать.' : hasAccessKey ? 'Ключ создан. Храните его у себя: он открывает этот кабинет.' : 'Сохраните ключ перед выходом. Без него вернуться в кабинет не получится.';
+    renderPayment();
   }
   function clearPrivateKey() {
     $('access-key').value = ''; $('access-result').hidden = true;
@@ -215,7 +325,7 @@
     $('create-access-button').hidden = false; message('access-error', '');
   }
   function clearPreviousWorkspace() {
-    resetForm(); clearPrivateKey(); $('review-text').textContent = ''; $('saved-situation').textContent = '';
+    clearPayment(); resetForm(); clearPrivateKey(); $('review-text').textContent = ''; $('saved-situation').textContent = '';
     document.querySelectorAll('.session-info').forEach((element) => { element.textContent = ''; });
   }
   function expireSession() {
@@ -270,7 +380,7 @@
       catch (error) { if (error.code === 'session_exists') acceptSession(await request('/client/session')); else throw error; }
       $('invitation').value = ''; $('access-login').value = '';
       showView('form-view', false); updateStep(false);
-      renderCase(await request('/client/case'));
+      await loadCurrentCase();
     } catch (error) { await handleError(error, currentView === 'login-view' ? 'login-error' : 'global-message'); }
     finally { if (setBusy(false, operation) !== undefined) $('login-button').textContent = 'Открыть кабинет →'; }
   });
@@ -290,13 +400,13 @@
     try {
       // Resolve an earlier uncertain write before assigning a new request ID to edited answers.
       if (pendingPayload && JSON.stringify(pendingPayload.questionnaire) !== JSON.stringify(data)) {
-        if (renderCase(await request('/client/case'))) return;
+        if ((await loadCurrentCase()).case) return;
         pendingPayload = null;
       }
       if (!pendingPayload) pendingPayload = { schema_version: 'm1-cis-v1', synthetic: true, client_request_id: crypto.randomUUID(), questionnaire: data };
       try { await request('/client/case', 'POST', pendingPayload); }
       catch (error) { if (error.code !== 'case_exists') throw error; }
-      renderCase(await request('/client/case'));
+      await loadCurrentCase();
     } catch (error) {
       if (error.status === 422) pendingPayload = null;
       await handleError(error, 'form-error');
@@ -312,16 +422,46 @@
   $('refresh-button').addEventListener('click', async () => {
     if (busy) return;
     const operation = setBusy(true); message('case-error', ''); message('global-message', '');
-    try { const result = await request('/client/case'); renderCase(result, false); message('global-message', result.review ? 'Кабинет обновлён.' : 'Пока без изменений. Разбор появится после проверки.'); }
+    try { const result = await loadCurrentCase(false); if (csrfToken) message('global-message', result.review ? 'Кабинет обновлён.' : 'Пока без изменений. Разбор появится после проверки.'); }
     catch (error) { await handleError(error, 'case-error'); }
     finally { setBusy(false, operation); }
+  });
+  $('payment-key-confirm').addEventListener('click', () => {
+    if (busy || !hasAccessKey || keyUncertain || $('access-key').value) return;
+    keySavedHere = true; renderPayment();
+  });
+  $('payment-checkout').addEventListener('click', (event) => {
+    if (busy || paymentLoading || !hasCurrentOrder() || paymentState.order.status !== 'pending' || paymentState.order.checkout_available !== true || !checkoutUrl($('payment-checkout').getAttribute('href'))) event.preventDefault();
+  });
+  $('payment-refresh-button').addEventListener('click', async () => {
+    if (busy || !currentCaseId) return;
+    const operation = setBusy(true);
+    try { await loadPayment(); }
+    finally { setBusy(false, operation); }
+  });
+  $('payment-create-button').addEventListener('click', async () => {
+    if (busy || paymentLoading || !currentCaseId || !paymentState?.enabled || hasCurrentOrder() || !keyReadyForOrder()) return;
+    const operation = setBusy(true); const epoch = paymentEpoch;
+    message('payment-error', ''); $('payment-create-button').textContent = 'Создаём демо-заказ…';
+    if (!pendingOrderPayload) pendingOrderPayload = { synthetic: true, product: 'pilot_7d', client_request_id: crypto.randomUUID(), case_id: currentCaseId };
+    try {
+      const result = await request('/client/orders', 'POST', pendingOrderPayload);
+      if (epoch !== paymentEpoch) return;
+      acceptPayment(result); pendingOrderPayload = null; renderPayment();
+    } catch (error) {
+      if (epoch !== paymentEpoch || error.code === 'stale_session') return;
+      if (error.code === 'payments_disabled') { paymentState = { enabled: false, order: null, entitlement: null, checkout_url: null }; renderPayment(); }
+      else if (error.code === 'access_key_required') message('payment-error', 'Сначала создайте и сохраните ключ кабинета в блоке выше. После этого повторите создание демо-заказа.');
+      else if (error.code === 'case_unavailable') message('payment-error', 'Эта анкета больше недоступна. Обновите кабинет перед созданием демо-заказа.');
+      else await handleError(error, 'payment-error');
+    } finally { if (setBusy(false, operation) !== undefined) $('payment-create-button').textContent = 'Создать демо-заказ на 990 ₽'; }
   });
   $('delete-button').addEventListener('click', () => { $('delete-confirmation').hidden = false; $('delete-button').hidden = true; $('delete-heading').focus(); });
   $('cancel-delete-button').addEventListener('click', () => { $('delete-confirmation').hidden = true; $('delete-button').hidden = false; $('delete-button').focus(); });
   $('confirm-delete-button').addEventListener('click', async () => {
     if (busy) return;
     const operation = setBusy(true); message('case-error', '');
-    try { await request('/client/case', 'DELETE'); resetForm(); $('review-text').textContent = ''; $('saved-situation').textContent = ''; showView('form-view', false); updateStep(); message('global-message', 'Тестовый пример удалён. Можно начать новый.'); }
+    try { await request('/client/case', 'DELETE'); clearPayment(); resetForm(); $('review-text').textContent = ''; $('saved-situation').textContent = ''; showView('form-view', false); updateStep(); message('global-message', 'Тестовый пример удалён. Можно начать новый.'); }
     catch (error) { await handleError(error, 'case-error'); }
     finally { setBusy(false, operation); }
   });
@@ -349,7 +489,7 @@
     try {
       acceptSession(await request('/client/session'));
       if (currentView === 'login-view') { showView('form-view', false); updateStep(false); }
-      renderCase(await request('/client/case'), false);
+      await loadCurrentCase(false);
     }
     catch (error) {
       if (error.status === 401 && !hadSession) { csrfToken = null; showView('login-view', false); }

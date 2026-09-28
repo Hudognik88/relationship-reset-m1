@@ -194,4 +194,10 @@ textarea{font-size:14px!important}
 .inline-warning h3{font-size:17px;margin-bottom:9px}.inline-warning p,.key-result p{font-size:11px;line-height:1.7;color:#796c83}
 .key-result label{display:block;font-size:12px;font-weight:600;margin-bottom:10px}.key-result textarea{font-family:monospace;font-size:13px;word-break:break-all;min-height:74px;background:#fff}
 .key-result .button,.inline-warning .button{font-size:11px;padding:10px 12px;gap:8px}.access-panel .field-error{margin:12px 0 0;font-size:11px}
+.payment-panel{margin-top:24px;padding:22px 20px;border:1px solid #e3d7ef;border-radius:14px;background:#faf7fc}
+.payment-topline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.payment-topline h3{font-size:18px;margin:3px 0 0;letter-spacing:-.02em}.payment-topline .status-pill{margin:0;flex:none}
+.payment-caption{font-size:12px;line-height:1.7;color:var(--muted);margin-bottom:17px}.payment-caption strong{font-weight:600;color:var(--ink);white-space:nowrap}
+.payment-status{font-size:13px;line-height:1.7;margin-bottom:13px}.payment-actions{display:grid;gap:10px;margin-top:16px}.payment-actions a{text-decoration:none}.payment-actions>a[aria-disabled=true]{opacity:.58;cursor:wait;pointer-events:none}
+.payment-panel .field-error{margin:14px 0 0;font-size:12px}.payment-panel .field-help{font-size:11px}.payment-actions .text-button{justify-self:start;text-align:left}.payment-actions button:disabled{cursor:not-allowed}
+@media(max-width:400px){.payment-panel{padding:18px 15px}.payment-topline h3{font-size:16px}.payment-topline{gap:8px}.payment-topline .status-pill{font-size:9px;padding:5px 8px}}
 @media(max-width:400px){.access-panel-top{display:block}.access-panel-top>.text-button{max-width:none;text-align:left;margin-top:8px}.key-result .form-actions,.inline-warning .form-actions{flex-direction:column;align-items:stretch}.key-result .button,.inline-warning .button{width:100%;margin-left:0!important}}

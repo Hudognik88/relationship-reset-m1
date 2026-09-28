@@ -64,7 +64,7 @@ class JdbcClientStore(private val source: DataSource) : ClientStore {
     }
 
     /** All account operations lock the canonical owner before any resumed session. */
-    private fun active(db: Connection, sessionId: String, now: Instant): String {
+    internal fun active(db: Connection, sessionId: String, now: Instant): String {
         val owner = db.prepareStatement("SELECT owner_session_id FROM rr_client_session_links WHERE session_id = ?").use { q ->
             q.setString(1, sessionId); q.executeQuery().use { if (it.next()) it.getString(1) else sessionId }
         }

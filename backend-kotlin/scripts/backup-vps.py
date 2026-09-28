@@ -23,6 +23,7 @@ DATABASE = "rr_kotlin_stage"
 TABLES = ("rr_cases", "rr_drafts", "rr_schema_migrations")
 CLIENT_TABLES = ("rr_client_invitations", "rr_client_sessions", "rr_client_cases", "rr_client_reviews")
 WORKSPACE_TABLES = ("rr_client_access_keys", "rr_client_session_links", "rr_owner_invitations", "rr_owner_sessions")
+PAYMENT_TABLES = ("rr_client_orders", "rr_payment_receipts", "rr_client_entitlements", "rr_client_order_requests")
 DOCKER_CONFIG = Path("/var/lib/relationship-reset-kotlin-staging-deploy/docker-config")
 DOCKER = ["docker", "--config", str(DOCKER_CONFIG), "--host", "unix:///var/run/docker.sock"]
 
@@ -146,7 +147,7 @@ class Database:
         # Retain partially applied additive tables in a backup too. This is a
         # recovery aid, not proof that the client migration is complete.
         require(set(TABLES).issubset(tables)
-                and set(tables).issubset(set(TABLES + CLIENT_TABLES + WORKSPACE_TABLES)),
+                and set(tables).issubset(set(TABLES + CLIENT_TABLES + WORKSPACE_TABLES + PAYMENT_TABLES)),
                 "unexpected_staging_tables")
         require(len(tables) == len(set(tables)), "duplicate_table_names")
         if expected is not None:
@@ -209,7 +210,8 @@ def verify_backup(db, directory, restore):
 
 
 def main():
-    require(len(sys.argv) == 1 and os.geteuid() == 0, "root_no_arguments_required")
+    require(sys.argv[1:] in ([], ["--require-payments"]) and os.geteuid() == 0, "root_known_arguments_required")
+    require_payments = sys.argv[1:] == ["--require-payments"]
     os.umask(0o077)
     for directory in (Path("/opt"), INSTALL, APP):
         protected(directory, directory=True)
@@ -234,6 +236,9 @@ def main():
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         protected(lock, mode=0o600)
         db = Database(identify_container())
+        if require_payments:
+            require(db.require_tables(DATABASE) == tuple(sorted(TABLES + CLIENT_TABLES + WORKSPACE_TABLES + PAYMENT_TABLES)),
+                    "complete_payment_schema_required")
         directory = Path(tempfile.mkdtemp(prefix=datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ-"), dir=BACKUPS))
         restore = "rr_restore_test_" + uuid.uuid4().hex[:24]
         metadata = directory / "verification.json"

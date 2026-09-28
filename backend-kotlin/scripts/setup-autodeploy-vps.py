@@ -23,6 +23,7 @@ FILES = {
     'smoke-vps.py': 'backend-kotlin/scripts/smoke-vps.py',
     'smoke-client-vps.py': 'backend-kotlin/scripts/smoke-client-vps.py',
     'smoke-workspace-vps.py': 'backend-kotlin/scripts/smoke-workspace-vps.py',
+    'smoke-payments-vps.py': 'backend-kotlin/scripts/smoke-payments-vps.py',
     'client-admin-vps.py': 'backend-kotlin/scripts/client-admin-vps.py',
     'backup-vps.py': 'backend-kotlin/scripts/backup-vps.py',
     'Dockerfile': 'backend-kotlin/Dockerfile',
