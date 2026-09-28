@@ -27,6 +27,12 @@ jobs:
         run: |
           bash -n scripts/deploy_pilot.sh
           python3 tests/pilot_receiver_test.py
+      - name: Test receiver on Beget Python 3.10
+        run: >-
+          docker run --rm --network none
+          --mount "type=bind,source=$PWD,target=/workspace,readonly"
+          --workdir /workspace --env PYTHONDONTWRITEBYTECODE=1
+          python:3.10-slim python tests/pilot_receiver_test.py
       - name: Validate standalone interest page and build review archive
         env:
           RELEASE_SHA: ${{ github.sha }}

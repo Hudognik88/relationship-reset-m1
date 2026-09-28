@@ -71,6 +71,16 @@ class PilotReceiverTests(unittest.TestCase):
     def test_valid_package_returns_exact_html(self):
         self.assertEqual(self.validate(self.package()), self.html)
 
+    def test_actual_pilot_page_is_valid_on_host_python(self):
+        remote.validate_html(self.html)
+
+    def test_plain_mailto_without_query_is_valid_on_host_python(self):
+        html = b'<!doctype html><html><head><title>Pilot</title></head><body><a href="mailto:moverelationship@gmail.com">Email</a></body></html>'
+        # Python 3.10 strict parse_qsl rejects an empty query; do not pass it one.
+        with mock.patch.object(remote, "parse_qsl", side_effect=ValueError("bad query field: ''")) as query_parser:
+            self.assertEqual(self.validate(self.package(html=html)), html)
+            query_parser.assert_not_called()
+
     def test_archive_and_manifest_are_bound_to_release_and_content(self):
         payload = self.package()
         with self.assertRaises(ValueError):
@@ -212,6 +222,69 @@ class PilotReceiverTests(unittest.TestCase):
             self.assert_unmanaged_unchanged(public, private)
             self.assertEqual(installer.upgrade(ROOT / "scripts", site)["status"], "unchanged")
             self.assertEqual(len(list((private / "receiver-upgrade-backups").iterdir())), 1)
+
+    def previous_pilot_module(self):
+        current = (ROOT / "scripts" / "publish_pilot_remote.py").read_bytes()
+        corrected = b'query = parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True) if parsed.query else []'
+        previous = b'query = parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True)'
+        self.assertEqual(current.count(corrected), 1)
+        original = current.replace(corrected, previous, 1)
+        self.assertEqual(digest(original), installer.PREVIOUS_PILOT_SHA256)
+        return original
+
+    def install_previous_pilot(self, private):
+        destination, _ = self.install_baseline(private)
+        dispatcher = (ROOT / "scripts" / "deploy_beget_remote.py").read_bytes()
+        (destination / "deploy_beget_remote.py").write_bytes(dispatcher)
+        original = self.previous_pilot_module()
+        (destination / "publish_pilot_remote.py").write_bytes(original)
+        (destination / "publish_pilot_remote.py").chmod(0o700)
+        return destination, original
+
+    def test_reviewed_pilot_correction_preserves_dispatcher_and_previous_module(self):
+        with tempfile.TemporaryDirectory() as directory:
+            site, public, private = self.fixture(directory)
+            destination, original = self.install_previous_pilot(private)
+            dispatcher = (destination / "deploy_beget_remote.py").read_bytes()
+            result = installer.upgrade(ROOT / "scripts", site)
+            self.assertEqual(result["status"], "upgraded")
+            backup = private / "receiver-upgrade-backups" / result["backup"]
+            self.assertEqual((backup / "publish_pilot_remote.py").read_bytes(), original)
+            self.assertEqual((destination / "deploy_beget_remote.py").read_bytes(), dispatcher)
+            self.assertEqual((destination / "publish_pilot_remote.py").read_bytes(),
+                             (ROOT / "scripts" / "publish_pilot_remote.py").read_bytes())
+            self.assertEqual(installer.upgrade(ROOT / "scripts", site)["status"], "unchanged")
+            self.assert_unmanaged_unchanged(public, private)
+
+    def test_pilot_correction_refuses_unknown_installed_module(self):
+        with tempfile.TemporaryDirectory() as directory:
+            site, public, private = self.fixture(directory)
+            destination, _ = self.install_previous_pilot(private)
+            target = destination / "publish_pilot_remote.py"
+            target.write_bytes(b"UNKNOWN_PILOT_MODULE")
+            with self.assertRaises(ValueError):
+                installer.upgrade(ROOT / "scripts", site)
+            self.assertEqual(target.read_bytes(), b"UNKNOWN_PILOT_MODULE")
+            self.assert_unmanaged_unchanged(public, private)
+
+    def test_pilot_correction_failure_restores_previous_module(self):
+        with tempfile.TemporaryDirectory() as directory:
+            site, public, private = self.fixture(directory)
+            destination, original = self.install_previous_pilot(private)
+            dispatcher = (destination / "deploy_beget_remote.py").read_bytes()
+            atomic_write = installer.atomic_write
+
+            def fail_dispatch(path, data, mode):
+                if path == destination / "deploy_beget_remote.py":
+                    raise OSError("Injected dispatch installation failure")
+                return atomic_write(path, data, mode)
+
+            with mock.patch.object(installer, "atomic_write", side_effect=fail_dispatch):
+                with self.assertRaises(OSError):
+                    installer.upgrade(ROOT / "scripts", site)
+            self.assertEqual((destination / "publish_pilot_remote.py").read_bytes(), original)
+            self.assertEqual((destination / "deploy_beget_remote.py").read_bytes(), dispatcher)
+            self.assert_unmanaged_unchanged(public, private)
 
     def test_upgrade_failure_rolls_back_new_module_before_dispatch(self):
         with tempfile.TemporaryDirectory() as directory:
